@@ -1,5 +1,7 @@
 {
-  "_help": "This is your list of sources. To add one, copy a line and change the name, url and tab. To remove one, delete its line (watch the commas!). Tab ids: arsenal, arsenalwomen, darts, f1, boxing, politics, local, london, music, festivals, celebs, tv, film, gaming, longreads, teaching, tech, running, money, travel, podcasts. Extras you can add to a source: \"pictures\": true sends its photos to the Pictures tab; \"max\": 10 limits how many posts it shows; \"only\": [\"London\"] keeps only posts mentioning those words; \"skip\": [\"word\"] hides posts mentioning them. Google News searches: change the words after q= to follow anything. \"people\": names in this list are followed quietly in Celebs and Pictures. \"youtube\": add any channel with its @handle from the channel page, e.g. { \"name\": \"Sidemen\", \"handle\": \"@Sidemen\" }.",
+  "_help": "This is your list of sources. To add one, copy a line and change the name, url and tab. To remove one, delete its line (watch the commas!). Tab ids: arsenal, arsenalwomen, darts, f1, boxing, politics, local, london, music, festivals, celebs, tv, film, gaming, longreads, teaching, tech, running, money, travel, podcasts. Extras you can add to a source: \"pictures\": true sends its photos to the Pictures tab; \"max\": 10 limits how many posts it shows; \"only\": [\"London\"] keeps only posts mentioning those words; \"skip\": [\"word\"] hides posts mentioning them. Google News searches: change the words after q= to follow anything. \"people\": names in this list are followed quietly in Celebs and Pictures. \"youtube\": add any channel with its @handle from the channel page, e.g. { \"name\": \"Sidemen\", \"handle\": \"@Sidemen\" }. \"artists\": DJs and producers you love; new mixes featuring them land in the Mixes tab and anything mentioning them gets a star.",
+
+  "artists": ["Palms Trax", "Shanti Celeste", "Dusky", "Joy Orbison", "Overmono", "Midland", "Four Tet", "Bicep", "Floating Points", "Jamie xx", "Ben UFO", "Peggy Gou", "Fred again..", "Skream", "Kettama", "Interplanetary Criminal", "Salute", "Saoirse", "Ahadadream", "Sherelle"],
 
   "people": [
     "Emily Ratajkowski",
@@ -32,19 +34,27 @@
   "youtube": [
     {"name": "BeardMeatsFood", "channel": "UCc9CjaAjsMMvaSghZB7-Kog"},
     {"name": "Channel 5", "handle": "@channel5youtube"},
-    {"name": "Boiler Room", "handle": "@boilerroom"},
-    {"name": "Cercle", "handle": "@Cercle"},
+    {"name": "Boiler Room", "handle": "@boilerroom", "tab": "mixes"},
+    {"name": "Cercle", "handle": "@Cercle", "tab": "mixes"},
     {"name": "Arsenal", "handle": "@arsenal"},
     {"name": "Formula 1", "handle": "@Formula1"},
     {"name": "PlayStation", "handle": "@PlayStation"},
     {"name": "Louis Theroux", "handle": "@LouisTheroux"},
     {"name": "Sidemen", "handle": "@Sidemen"},
-    {"name": "KEXP", "handle": "@kexp"},
+    {"name": "KEXP", "handle": "@kexp", "tab": "mixes"},
     {"name": "NPR Music (Tiny Desk)", "handle": "@nprmusic"},
-    {"name": "Mixmag", "handle": "@Mixmag"},
+    {"name": "Mixmag", "handle": "@Mixmag", "tab": "mixes"},
     {"name": "A24", "handle": "@A24"},
     {"name": "WTF1", "handle": "@WTF1"},
-    {"name": "Off Menu", "handle": "@offmenupodcast"}
+    {"name": "Off Menu", "handle": "@offmenupodcast"},
+    {"name": "HÖR Berlin", "handle": "@hoer.berlin", "tab": "mixes"},
+    {"name": "The Lot Radio", "handle": "@TheLotRadio", "tab": "mixes"},
+    {"name": "Rinse FM", "handle": "@RinseFM", "tab": "mixes"},
+    {"name": "DJ Mag", "handle": "@djmag", "tab": "mixes"}
+  ],
+
+  "mixPodcasts": [
+    {"name": "RA Podcast", "apple": "129673441", "max": 8}
   ],
 
   "tabs": [
@@ -57,12 +67,13 @@
     {"id": "local", "name": "Lewisham", "colour": "#38bdf8"},
     {"id": "london", "name": "London", "colour": "#facc15"},
     {"id": "music", "name": "Music", "colour": "#a78bfa"},
+    {"id": "mixes", "name": "Mixes", "colour": "#e879f9"},
     {"id": "festivals", "name": "Festivals", "colour": "#f472b6"},
     {"id": "celebs", "name": "Celebs", "colour": "#fbbf24"},
     {"id": "tv", "name": "TV", "colour": "#818cf8"},
     {"id": "film", "name": "Film", "colour": "#c084fc"},
     {"id": "gaming", "name": "Gaming", "colour": "#34d399"},
-    {"id": "longreads", "name": "Long reads", "colour": "#e5e7eb"},
+    {"id": "longreads", "name": "Long reads", "colour": "#a1a1aa"},
     {"id": "teaching", "name": "Teaching", "colour": "#2dd4bf"},
     {"id": "tech", "name": "Tech & AI", "colour": "#06b6d4"},
     {"id": "running", "name": "Running", "colour": "#fb923c"},
@@ -116,6 +127,7 @@
     {"tab": "london", "name": "What's on", "url": "https://news.google.com/rss/search?q=London+(%22new+exhibition%22+OR+%22opens+in%22+OR+%22pop-up%22+OR+%22restaurant+opening%22)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
     {"tab": "london", "name": "Evening Standard", "url": "https://www.standard.co.uk/rss", "max": 15},
     {"tab": "london", "name": "Secret London", "url": "https://news.google.com/rss/search?q=site:secretldn.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
+    {"tab": "london", "name": "Hot Dinners", "url": "https://news.google.com/rss/search?q=site:hot-dinners.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
 
     {"tab": "music", "name": "Guardian Music", "url": "https://www.theguardian.com/music/rss"},
     {"tab": "music", "name": "Mixmag", "url": "https://mixmag.net/rss.xml"},
@@ -126,6 +138,8 @@
     {"tab": "music", "name": "Resident Advisor", "url": "https://news.google.com/rss/search?q=site:ra.co+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 12},
     {"tab": "music", "name": "Crack Magazine", "url": "https://news.google.com/rss/search?q=site:crackmagazine.net+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
     {"tab": "music", "name": "DJ Mag", "url": "https://news.google.com/rss/search?q=site:djmag.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 12},
+    {"tab": "music", "name": "Mixmag (site)", "url": "https://news.google.com/rss/search?q=site:mixmag.net+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
+    {"tab": "music", "name": "NME Music", "url": "https://www.nme.com/news/music/feed", "max": 12},
 
     {"tab": "festivals", "name": "Guardian Festivals", "url": "https://news.google.com/rss/search?q=site:theguardian.com+festival+music+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
     {"tab": "festivals", "name": "NME Festivals", "url": "https://news.google.com/rss/search?q=site:nme.com+festival+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
@@ -140,11 +154,21 @@
     {"tab": "celebs", "name": "Metro Showbiz", "url": "https://metro.co.uk/entertainment/showbiz/feed/", "max": 15},
     {"tab": "celebs", "name": "People", "url": "https://news.google.com/rss/search?q=site:people.com+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
     {"tab": "celebs", "name": "Hello!", "url": "https://news.google.com/rss/search?q=site:hellomagazine.com+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
+    {"tab": "celebs", "name": "Vogue UK", "url": "https://www.vogue.co.uk/feed/rss", "max": 15, "pictures": true},
+    {"tab": "celebs", "name": "Harper's Bazaar UK", "url": "https://www.harpersbazaar.com/uk/rss/all.xml/", "max": 15, "pictures": true},
+    {"tab": "celebs", "name": "Elle UK", "url": "https://www.elle.com/uk/rss/all.xml/", "max": 15, "pictures": true},
+    {"tab": "celebs", "name": "Cosmopolitan UK", "url": "https://www.cosmopolitan.com/uk/rss/all.xml/", "max": 12, "pictures": true},
+    {"tab": "celebs", "name": "GQ UK", "url": "https://www.gq-magazine.co.uk/feed/rss", "max": 12, "pictures": true},
+    {"tab": "celebs", "name": "Vanity Fair", "url": "https://www.vanityfair.com/feed/rss", "max": 12, "pictures": true},
+    {"tab": "celebs", "name": "W Magazine", "url": "https://www.wmagazine.com/rss", "max": 10, "pictures": true},
 
     {"tab": "tv", "name": "Guardian TV", "url": "https://www.theguardian.com/tv-and-radio/rss", "pictures": true},
     {"tab": "tv", "name": "New series", "url": "https://news.google.com/rss/search?q=(%22new+series%22+OR+%22season+2%22+OR+trailer)+(Netflix+OR+%22BBC+iPlayer%22+OR+%22Disney%2B%22+OR+%22Apple+TV%22+OR+%22Prime+Video%22)+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 15},
     {"tab": "tv", "name": "Radio Times", "url": "https://news.google.com/rss/search?q=site:radiotimes.com+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 12},
     {"tab": "tv", "name": "Digital Spy", "url": "https://news.google.com/rss/search?q=site:digitalspy.com+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 12},
+    {"tab": "tv", "name": "Esquire UK", "url": "https://www.esquire.com/uk/rss/all.xml/", "max": 12},
+    {"tab": "tv", "name": "Digital Spy (all)", "url": "https://www.digitalspy.com/rss/all.xml/", "max": 15, "pictures": true},
+    {"tab": "tv", "name": "Deadline TV", "url": "https://deadline.com/category/tv/feed/", "max": 10},
 
     {"tab": "film", "name": "Guardian Film", "url": "https://www.theguardian.com/film/rss", "pictures": true},
     {"tab": "film", "name": "Trailers & releases", "url": "https://news.google.com/rss/search?q=film+(trailer+OR+%22release+date%22+OR+%22box+office%22)+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
@@ -159,6 +183,8 @@
     {"tab": "film", "name": "/Film", "url": "https://www.slashfilm.com/feed/", "max": 10},
     {"tab": "film", "name": "Empire", "url": "https://news.google.com/rss/search?q=site:empireonline.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 12},
     {"tab": "film", "name": "Letterboxd Journal", "url": "https://news.google.com/rss/search?q=site:letterboxd.com+journal+when:14d&hl=en-GB&gl=GB&ceid=GB:en", "max": 8},
+    {"tab": "film", "name": "Esquire Film", "url": "https://news.google.com/rss/search?q=site:esquire.com+film+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 8},
+    {"tab": "film", "name": "BFI", "url": "https://news.google.com/rss/search?q=site:bfi.org.uk+when:14d&hl=en-GB&gl=GB&ceid=GB:en", "max": 8},
 
     {"tab": "gaming", "name": "Push Square", "url": "https://www.pushsquare.com/feeds/latest"},
     {"tab": "gaming", "name": "PlayStation Blog", "url": "https://blog.playstation.com/feed/"},
@@ -167,12 +193,14 @@
     {"tab": "gaming", "name": "VGC", "url": "https://www.videogameschronicle.com/feed/", "max": 15},
     {"tab": "gaming", "name": "GameSpot", "url": "https://www.gamespot.com/feeds/mashup/", "max": 12},
     {"tab": "gaming", "name": "Kotaku", "url": "https://kotaku.com/rss", "max": 10},
+    {"tab": "gaming", "name": "Push Square Reviews", "url": "https://news.google.com/rss/search?q=site:pushsquare.com+review+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 8},
 
     {"tab": "longreads", "name": "The Long Read", "url": "https://www.theguardian.com/news/series/the-long-read/rss"},
     {"tab": "longreads", "name": "Aeon", "url": "https://aeon.co/feed.rss"},
     {"tab": "longreads", "name": "Longreads", "url": "https://longreads.com/feed/"},
     {"tab": "longreads", "name": "The Atlantic", "url": "https://www.theatlantic.com/feed/all/", "max": 10},
     {"tab": "longreads", "name": "The New Yorker", "url": "https://www.newyorker.com/feed/everything", "max": 10},
+    {"tab": "longreads", "name": "Guardian Saturday", "url": "https://www.theguardian.com/lifeandstyle/series/the-saturday-interview/rss", "max": 6},
 
     {"tab": "teaching", "name": "Schools Week", "url": "https://news.google.com/rss/search?q=site:schoolsweek.co.uk+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
     {"tab": "teaching", "name": "Guardian Schools", "url": "https://www.theguardian.com/education/schools/rss"},
@@ -191,6 +219,7 @@
     {"tab": "running", "name": "Runner's World UK", "url": "https://www.runnersworld.com/uk/rss/all.xml/"},
     {"tab": "running", "name": "Running news", "url": "https://news.google.com/rss/search?q=(%22London+Marathon%22+OR+parkrun+OR+%22half+marathon%22)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
     {"tab": "running", "name": "Athletics Weekly", "url": "https://news.google.com/rss/search?q=site:athleticsweekly.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
+    {"tab": "running", "name": "Men's Health UK", "url": "https://www.menshealth.com/uk/rss/all.xml/", "max": 10},
 
     {"tab": "money", "name": "Guardian Money", "url": "https://www.theguardian.com/money/rss"},
     {"tab": "money", "name": "MoneySavingExpert", "url": "https://www.moneysavingexpert.com/news/feeds/news.rss"},

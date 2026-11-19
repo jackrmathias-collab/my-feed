@@ -10,8 +10,14 @@ const MAX_AGE_DAYS = 7;
 
 // "youtube" in feeds.json: new uploads from these channels go in the YouTube tab.
 for (const yt of config.youtube || []) {
-  config.sources.push({ tab: "youtube", name: yt.name, youtube: yt.channel || yt.handle, max: yt.max || 6 });
+  config.sources.push({ tab: yt.tab || "youtube", name: yt.name, youtube: yt.channel || yt.handle, max: yt.max || 6 });
 }
+
+// "artists" in feeds.json: new DJ mixes featuring them (from Mixcloud, where NTS, Rinse and lots of radio shows post).
+const artists = config.artists || [];
+for (const a of artists) config.sources.push({ tab: "mixes", name: a, mixcloud: a, max: 4, quiet: true, quietName: "Mixcloud searches" });
+// Podcasts by Apple Podcasts id (we look up their feed address automatically)
+for (const p of config.mixPodcasts || []) config.sources.push({ tab: "mixes", name: p.name, apple: p.apple, max: p.max || 6 });
 
 // "people" in feeds.json: follow these names quietly in Celebs (and their photos in Pictures).
 const people = config.people || [];
@@ -125,6 +131,7 @@ function normalise(it, src) {
     image: pickImage(it),
     summary,
     pictures: !!src.pictures,
+    ...(src.tab === "mixes" || src.tab === "podcasts" ? (() => { const d = text(it["itunes:duration"]); if (!d) return {}; const p = d.split(":").map(Number); const secs = p.reduce((a, b) => a * 60 + b, 0); return secs > 600 ? { mins: Math.round(secs / 60), mix: src.tab === "mixes" } : {}; })() : {}),
   };
 }
 
@@ -159,8 +166,25 @@ async function getXml(src, i) {
   return res.text();
 }
 
+async function mixcloud(src) {
+  const j = await (await fetch(`https://api.mixcloud.com/search/?q=${encodeURIComponent(src.mixcloud)}&type=cloudcast&limit=40`, { signal: AbortSignal.timeout(15000) })).json();
+  const name = src.mixcloud.toLowerCase(), cutoff = Date.now() - 120 * 864e5;
+  return (j.data || [])
+    .filter((c) => (c.name || "").toLowerCase().includes(name) && Date.parse(c.created_time) > cutoff)
+    .sort((a, b) => Date.parse(b.created_time) - Date.parse(a.created_time))
+    .slice(0, src.max || 4)
+    .map((c) => ({ title: c.name, link: c.url, source: c.user?.name || "Mixcloud", tab: src.tab, date: new Date(c.created_time).toISOString(),
+      image: c.pictures?.extra_large || c.pictures?.large || null, summary: (c.tags || []).map((t) => t.name).slice(0, 4).join(" · "), pictures: false,
+      mins: c.audio_length ? Math.round(c.audio_length / 60) : undefined, mix: true }));
+}
+
 async function load(src, i) {
   try {
+    if (src.mixcloud && !FIXTURES) { const out = await mixcloud(src); return { name: src.name, tab: src.tab, ok: true, count: out.length, items: out }; }
+    if (src.apple && !FIXTURES && !src.url) {
+      const lk = await (await fetch(`https://itunes.apple.com/lookup?id=${src.apple}`, { signal: AbortSignal.timeout(15000) })).json();
+      src.url = lk.results?.[0]?.feedUrl; if (!src.url) throw new Error("Couldn't find podcast feed");
+    }
     const xml = await getXml(src, i);
     const doc = parser.parse(xml);
     const items = doc.rss ? arr(doc.rss.channel?.item) : doc.feed ? arr(doc.feed.entry) : doc["rdf:RDF"] ? arr(doc["rdf:RDF"].item) : null;
@@ -199,17 +223,101 @@ for (const r of results) for (const it of r.items) {
   items.push(it);
 }
 items.sort((a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0));
+// Star anything that mentions one of your artists
+const artistRe = artists.length ? new RegExp("\\b(" + artists.map((a) => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\b", "i") : null;
+if (artistRe) for (const it of items) { const m = it.title.match(artistRe); if (m) it.fav = m[1]; }
+
+// ---------- Extras: bigger photos and reading times ----------
+// Reuse what we worked out last time, so each refresh only visits brand-new articles.
+const prevCache = new Map();
+if (!FIXTURES && process.env.GITHUB_REPOSITORY) {
+  const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+  try {
+    const prev = await (await fetch(`https://${owner.toLowerCase()}.github.io/${repo}/data/feed.json`, { signal: AbortSignal.timeout(15000) })).json();
+    for (const it of prev.items || []) if (it.big || it.mins || it.checked) prevCache.set(it.link, { big: it.big, mins: it.mins });
+  } catch {}
+}
+const wantsExtras = (it) => (it.pictures || it.tab === "longreads" || it.tab === "film" || it.tab === "tv") &&
+  /^https?:/.test(it.link) && !/news\.google\.com|youtube\.com|\.mp3|megaphone|acast/.test(it.link);
+async function extras(it) {
+  const res = await fetch(it.link, { headers: { "User-Agent": UA, Accept: "text/html" }, signal: AbortSignal.timeout(10000), redirect: "follow" });
+  if (!res.ok) return {};
+  const html = (await res.text()).slice(0, 1_500_000);
+  const out = {};
+  const og = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)(?::src)?["'][^>]*content=["']([^"']+)["']/i)
+    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["'](?:og:image|twitter:image)["']/i);
+  // The Guardian stamps its logo on share images, so keep its normal photo instead.
+  if (og && !/guim\.co\.uk/.test(og[1])) out.big = decode(og[1]);
+  const body = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ");
+  const words = (body.match(/<p[^>]*>[\s\S]*?<\/p>/gi) || []).map(stripHtml).join(" ").split(/\s+/).filter(Boolean).length;
+  if (words > 350) out.mins = Math.max(1, Math.round(words / 230));
+  return out;
+}
+if (!FIXTURES) {
+  const todo = [];
+  for (const it of items) {
+    if (!wantsExtras(it)) continue;
+    const c = prevCache.get(it.link);
+    if (c) { if (c.big) it.big = c.big; if (c.mins) it.mins = c.mins; it.checked = 1; }
+    else todo.push(it);
+  }
+  const batch = todo.slice(0, 160);
+  await Promise.all(Array.from({ length: 10 }, async () => {
+    while (batch.length) { const it = batch.shift(); try { Object.assign(it, await extras(it)); } catch {} it.checked = 1; }
+  }));
+  console.log(`Extras: ${prevCache.size} remembered, ${Math.min(todo.length, 160)} new articles checked.`);
+}
+
+// ---------- Arsenal: next match and last result ----------
+async function arsenalFixtures() {
+  const leagues = ["eng.1", "uefa.champions", "eng.fa", "eng.league_cup"];
+  const events = new Map();
+  for (const lg of leagues) for (const q of ["", "?fixture=true"]) {
+    try {
+      const j = await (await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/teams/359/schedule${q}`, { signal: AbortSignal.timeout(12000) })).json();
+      for (const e of j.events || []) events.set(e.id, { e, league: j.events && (e.league?.name || e.season?.displayName || lg) , lg });
+    } catch {}
+  }
+  const names = { "eng.1": "Premier League", "uefa.champions": "Champions League", "eng.fa": "FA Cup", "eng.league_cup": "Carabao Cup" };
+  const simple = ({ e, lg }) => {
+    const c = e.competitions?.[0] || {};
+    const teams = (c.competitors || []).map((t) => ({
+      name: t.team?.shortDisplayName || t.team?.displayName, home: t.homeAway === "home",
+      logo: t.team?.logos?.[0]?.href || t.team?.logo, score: t.score?.displayValue ?? t.score?.value ?? null, arsenal: String(t.team?.id || t.id) === "359",
+    }));
+    return { date: e.date, comp: names[lg] || lg, venue: c.venue?.fullName || "", state: c.status?.type?.state || e.status?.type?.state, done: !!(c.status?.type?.completed || e.status?.type?.completed), teams };
+  };
+  const all = [...events.values()].map(simple).filter((m) => m.teams.length === 2).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+  const now = Date.now();
+  const next = all.find((m) => !m.done && Date.parse(m.date) > now - 3 * 3600e3);
+  const last = [...all].reverse().find((m) => m.done);
+  return next || last ? { next, last } : null;
+}
+let arsenal = null;
+if (!FIXTURES) {
+  arsenal = await arsenalFixtures().catch(() => null);
+  console.log(arsenal?.next ? `Arsenal next: ${arsenal.next.teams.map((t) => t.name).join(" v ")} ${arsenal.next.date}` : "Arsenal fixtures: none found");
+} else {
+  const d = new Date(Date.now() + 2.3 * 864e5); d.setUTCHours(17, 30, 0, 0);
+  arsenal = { next: { date: d.toISOString(), comp: "Premier League", venue: "Emirates Stadium", state: "pre", done: false, teams: [{ name: "Arsenal", home: true, arsenal: true, logo: null }, { name: "Chelsea", home: false, logo: null }] },
+    last: { date: new Date(Date.now() - 4 * 864e5).toISOString(), comp: "Champions League", done: true, teams: [{ name: "Arsenal", home: true, arsenal: true, score: "3" }, { name: "Inter", home: false, score: "1" }] } };
+}
 
 const out = {
   updated: new Date().toISOString(),
   tabs: config.tabs,
+  arsenal,
   health: (() => {
-    const h = [], quiet = { name: "Showbiz extras", tab: "celebs", ok: true, count: 0, working: 0, total: 0 };
+    const h = [], groups = {};
     results.forEach((r, i) => {
-      if (config.sources[i].quiet) { quiet.total++; if (r.ok) { quiet.working++; quiet.count += r.count; } return; }
+      const src = config.sources[i];
+      if (src.quiet) {
+        const g = (groups[src.quietName || "Showbiz extras"] ||= { name: src.quietName || "Showbiz extras", tab: src.tab, count: 0, working: 0, total: 0 });
+        g.total++; if (r.ok) { g.working++; g.count += r.count; } return;
+      }
       h.push({ name: r.name, tab: r.tab, ok: r.ok, count: r.count || 0, error: r.error });
     });
-    if (quiet.total) { quiet.ok = quiet.working > 0; quiet.name += ` (${quiet.working}/${quiet.total} working)`; h.push(quiet); }
+    for (const g of Object.values(groups)) h.push({ ...g, ok: g.working > 0, name: `${g.name} (${g.working}/${g.total} working)` });
     return h;
   })(),
   items,
