@@ -2,7 +2,7 @@ name: Update my feed
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
+    - cron: "7,37 * * * *"   # every 30 minutes (off the hour, when GitHub is less busy)
   workflow_dispatch:          # lets you press "Run workflow" to refresh now
   push:
     branches: [main]

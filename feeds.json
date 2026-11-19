@@ -39,13 +39,11 @@
     {"name": "PlayStation", "handle": "@PlayStation"},
     {"name": "Louis Theroux", "handle": "@LouisTheroux"},
     {"name": "Sidemen", "handle": "@Sidemen"},
-    {"name": "ChrisMD", "handle": "@ChrisMD"},
     {"name": "KEXP", "handle": "@kexp"},
     {"name": "NPR Music (Tiny Desk)", "handle": "@nprmusic"},
     {"name": "Mixmag", "handle": "@Mixmag"},
     {"name": "A24", "handle": "@A24"},
     {"name": "WTF1", "handle": "@WTF1"},
-    {"name": "The Race", "handle": "@TheRaceMedia"},
     {"name": "Off Menu", "handle": "@offmenupodcast"}
   ],
 
@@ -117,7 +115,6 @@
     {"tab": "london", "name": "Londonist", "url": "https://londonist.com/feed"},
     {"tab": "london", "name": "What's on", "url": "https://news.google.com/rss/search?q=London+(%22new+exhibition%22+OR+%22opens+in%22+OR+%22pop-up%22+OR+%22restaurant+opening%22)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
     {"tab": "london", "name": "Evening Standard", "url": "https://www.standard.co.uk/rss", "max": 15},
-    {"tab": "london", "name": "IanVisits", "url": "https://www.ianvisits.co.uk/feed/", "max": 10},
     {"tab": "london", "name": "Secret London", "url": "https://news.google.com/rss/search?q=site:secretldn.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
 
     {"tab": "music", "name": "Guardian Music", "url": "https://www.theguardian.com/music/rss"},
