@@ -207,10 +207,22 @@ async function load(src, i) {
 }
 
 const results = [];
-const queue = config.sources.map((s, i) => [s, i]);
-await Promise.all(Array.from({ length: 6 }, async () => {
-  while (queue.length) { const [s, i] = queue.shift(); results[i] = await load(s, i); }
-}));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const all = config.sources.map((s, i) => [s, i]);
+// Google News gets grumpy if we ask too fast, so its searches go one at a time.
+const gnews = all.filter(([s]) => /news\.google\.com/.test(s.url || ""));
+const queue = all.filter(([s]) => !/news\.google\.com/.test(s.url || ""));
+await Promise.all([
+  ...Array.from({ length: 6 }, async () => { while (queue.length) { const [s, i] = queue.shift(); results[i] = await load(s, i); } }),
+  (async () => {
+    for (const [s, i] of gnews) {
+      let r = await load(s, i);
+      if (!r.ok && /429/.test(r.error) && !FIXTURES) { await sleep(8000); r = await load(s, i); }
+      results[i] = r;
+      if (!FIXTURES) await sleep(1200);
+    }
+  })(),
+]);
 
 // Merge, remove duplicates (same story from two places), newest first.
 const seen = new Set();
@@ -327,3 +339,4 @@ await writeFile(new URL("data/feed.json", ROOT), JSON.stringify(out));
 const broken = results.filter((r) => !r.ok);
 console.log(`${items.length} posts from ${results.length - broken.length}/${results.length} sources.`);
 for (const b of broken) console.log(`  ✗ ${b.name}: ${b.error}`);
+for (const h of out.health) if (/working\)/.test(h.name)) console.log(`  · ${h.name}: ${h.count} posts`);
