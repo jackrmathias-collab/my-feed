@@ -85,7 +85,10 @@ function linkOf(it) {
     if (typeof l === "string") return l.trim();
     if (l["@href"] && (!l["@rel"] || l["@rel"] === "alternate")) return l["@href"];
   }
-  return text(it.guid) || "";
+  const g = text(it.guid);
+  if (/^https?:/.test(g)) return g;
+  for (const e of arr(it.enclosure)) if (e["@url"]) return e["@url"]; // podcasts: the episode audio
+  return "";
 }
 
 function normalise(it, src) {

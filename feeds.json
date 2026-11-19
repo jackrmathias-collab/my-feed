@@ -156,6 +156,8 @@
     {"tab": "travel", "name": "Cheap flights", "url": "https://news.google.com/rss/search?q=%22cheap+flights%22+OR+%22flight+deal%22+London+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
 
     {"tab": "podcasts", "name": "Football Weekly", "url": "https://www.theguardian.com/football/series/footballweekly/podcast.xml", "max": 5},
+    {"tab": "podcasts", "name": "The Romesh Ranganathan Show", "url": "https://feeds.megaphone.fm/romesh", "max": 5},
+    {"tab": "podcasts", "name": "Off Menu", "url": "https://feeds.acast.com/public/shows/b19ac1f5-6adf-4c8b-aa1a-2af2160f99e4", "max": 5},
     {"tab": "podcasts", "name": "Today in Focus", "url": "https://www.theguardian.com/news/series/todayinfocus/podcast.xml", "max": 5}
   ]
 }
