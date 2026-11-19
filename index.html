@@ -53,7 +53,10 @@
   .title{font-weight:600;font-size:16.5px;line-height:1.35;margin:0 0 4px;letter-spacing:-.005em}
   .summary{color:#b9b9c4;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14.5px}
   .img{margin-top:10px;border-radius:14px;overflow:hidden;background:var(--panel2);border:1px solid var(--line);aspect-ratio:16/9}
+  .img{position:relative}
   .img img{width:100%;height:100%;object-fit:cover;display:block}
+  .play{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+  .play:after{content:"";border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:5px}
   .actions{display:flex;gap:4px;margin-top:8px;margin-left:-8px}
   .act{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;padding:6px 8px;border-radius:999px}
   .act svg{width:18px;height:18px}
@@ -260,7 +263,7 @@
           <span class="tabname">· ${esc(t.name)}</span><span>· ${ago(it.date)}</span></div>
         <h2 class="title">${esc(it.title)}</h2>
         ${it.summary ? `<p class="summary">${esc(it.summary)}</p>` : ""}
-        ${it.image ? `<div class="img"><img loading="lazy" referrerpolicy="no-referrer" src="${esc(it.image)}" alt="" onerror="this.parentNode.remove()"></div>` : ""}
+        ${it.image ? `<div class="img"><img loading="lazy" referrerpolicy="no-referrer" src="${esc(it.image)}" alt="" onerror="this.parentNode.remove()">${/youtube\.com\/(watch|shorts)/.test(it.link) ? '<span class="play"></span>' : ""}</div>` : ""}
       </a>
       <div class="actions">
         <button class="act ${isSaved ? "saved" : ""}" data-save="${it.id}">${bookmarkSvg}${isSaved ? "Saved" : "Save"}</button>

@@ -1,7 +1,43 @@
 {
-  "_help": "This is your list of sources. To add one, copy a line and change the name, url and tab. To remove one, delete its line (watch the commas!). Tab ids: arsenal, arsenalwomen, darts, f1, boxing, politics, local, london, music, festivals, celebs, tv, film, gaming, longreads, teaching, tech, running, money, travel, podcasts. Extras you can add to a source: \"pictures\": true sends its photos to the Pictures tab; \"max\": 10 limits how many posts it shows; \"only\": [\"London\"] keeps only posts mentioning those words; \"skip\": [\"word\"] hides posts mentioning them. Google News searches: change the words after q= to follow anything. \"people\": names in this list are followed quietly in Celebs and Pictures.",
+  "_help": "This is your list of sources. To add one, copy a line and change the name, url and tab. To remove one, delete its line (watch the commas!). Tab ids: arsenal, arsenalwomen, darts, f1, boxing, politics, local, london, music, festivals, celebs, tv, film, gaming, longreads, teaching, tech, running, money, travel, podcasts. Extras you can add to a source: \"pictures\": true sends its photos to the Pictures tab; \"max\": 10 limits how many posts it shows; \"only\": [\"London\"] keeps only posts mentioning those words; \"skip\": [\"word\"] hides posts mentioning them. Google News searches: change the words after q= to follow anything. \"people\": names in this list are followed quietly in Celebs and Pictures. \"youtube\": add any channel with its @handle from the channel page, e.g. { \"name\": \"Sidemen\", \"handle\": \"@Sidemen\" }.",
 
-  "people": ["Emily Ratajkowski", "Elsie Hewitt", "Penny Lane"],
+  "people": [
+    "Emily Ratajkowski",
+    "Elsie Hewitt",
+    "Penny Lane",
+    "Sydney Sweeney",
+    "Inde Navarrette",
+    "Margaret Qualley",
+    "Ana de Armas",
+    "Margot Robbie",
+    "Florence Pugh",
+    "Zendaya",
+    "Dua Lipa",
+    "Hailey Bieber",
+    "Kendall Jenner",
+    "Bella Hadid",
+    "Gigi Hadid",
+    "Madelyn Cline",
+    "Alexandra Daddario",
+    "Elizabeth Olsen",
+    "Phoebe Dynevor",
+    "Simone Ashley",
+    "Rosie Huntington-Whiteley",
+    "Barbara Palvin",
+    "Kaia Gerber",
+    "Emma Chamberlain",
+    "Jodie Comer"
+  ],
+
+  "youtube": [
+    { "name": "BeardMeatsFood", "channel": "UCc9CjaAjsMMvaSghZB7-Kog" },
+    { "name": "Channel 5", "handle": "@channel5youtube" },
+    { "name": "Boiler Room", "handle": "@boilerroom" },
+    { "name": "Cercle", "handle": "@Cercle" },
+    { "name": "Arsenal", "handle": "@arsenal" },
+    { "name": "Formula 1", "handle": "@Formula1" },
+    { "name": "PlayStation", "handle": "@PlayStation" }
+  ],
 
   "tabs": [
     {"id": "arsenal", "name": "Arsenal", "colour": "#ef4444"},
@@ -24,6 +60,7 @@
     {"id": "running", "name": "Running", "colour": "#fb923c"},
     {"id": "money", "name": "Money", "colour": "#a3e635"},
     {"id": "travel", "name": "Travel deals", "colour": "#0ea5e9"},
+    {"id": "youtube", "name": "YouTube", "colour": "#ff0033"},
     {"id": "podcasts", "name": "Podcasts", "colour": "#f59e0b"}
   ],
 
