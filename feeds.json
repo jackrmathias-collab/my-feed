@@ -103,7 +103,7 @@
     {"tab": "music", "name": "Pitchfork News", "url": "https://pitchfork.com/feed/feed-news/rss", "max": 10},
     {"tab": "music", "name": "Your artists", "url": "https://news.google.com/rss/search?q=%22Four+Tet%22+OR+Overmono+OR+%22Joy+Orbison%22+OR+%22Shanti+Celeste%22+OR+%22Bicep+DJ%22+OR+%22Bicep+album%22+OR+%22Dusky+DJ%22&hl=en-GB&gl=GB&ceid=GB:en", "max": 15},
 
-    {"tab": "festivals", "name": "Guardian Festivals", "url": "https://www.theguardian.com/music/festivals/rss"},
+    {"tab": "festivals", "name": "Guardian Festivals", "url": "https://news.google.com/rss/search?q=site:theguardian.com+festival+music+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
     {"tab": "festivals", "name": "NME Festivals", "url": "https://news.google.com/rss/search?q=site:nme.com+festival+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
     {"tab": "festivals", "name": "Line-ups", "url": "https://news.google.com/rss/search?q=(%22festival+line-up%22+OR+%22festival+lineup%22)+(UK+OR+London+OR+Glastonbury+OR+%22Field+Day%22+OR+%22All+Points+East%22+OR+Houghton+OR+Dekmantel)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 15},
 
