@@ -15,6 +15,8 @@ for (const yt of config.youtube || []) {
 
 // "artists" in feeds.json: new DJ mixes featuring them (from Mixcloud, where NTS, Rinse and lots of radio shows post).
 const artists = config.artists || [];
+// "blocked" in feeds.json: posts mentioning these never reach the app, on any device.
+const blockedRe = (config.blocked || []).length ? new RegExp("\\b(" + config.blocked.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "i") : null;
 for (const a of artists) config.sources.push({ tab: "mixes", name: a, mixcloud: a, max: 4, quiet: true, quietName: "Mixcloud searches" });
 // Podcasts by Apple Podcasts id (we look up their feed address automatically)
 for (const p of config.mixPodcasts || []) config.sources.push({ tab: "mixes", name: p.name, apple: p.apple, max: p.max || 6 });
@@ -197,6 +199,7 @@ async function load(src, i) {
         const hay = (x.title + " " + x.summary).toLowerCase();
         if (src.only && !src.only.some((w) => hay.includes(w.toLowerCase()))) return false;
         if (src.skip && src.skip.some((w) => hay.includes(w.toLowerCase()))) return false;
+        if (blockedRe && (blockedRe.test(hay) || blockedRe.test(x.link))) return false;
         return true;
       })
       .slice(0, src.max || DEFAULT_MAX);
