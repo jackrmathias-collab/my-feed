@@ -19,6 +19,8 @@ Everything lives in **`feeds.json`**. Open it on GitHub, tap the pencil icon to 
 - **Follow any topic:** use a Google News search. Copy one of the `news.google.com` lines and change the words after `q=`, using `+` instead of spaces. For example `q=%22Shanti+Celeste%22` follows Shanti Celeste. (`%22` means a quote mark.)
 - **Photos in the Pictures tab:** add `"pictures": true` to a source.
 - **Fewer posts from a busy source:** add `"max": 10`.
+- **Only certain posts from a source:** add `"only": ["London"]` to keep posts mentioning those words, or `"skip": ["word"]` to drop them.
+- **People:** names in the `"people"` list at the top are followed quietly in Celebs, with their photos in Pictures.
 
 Settings inside the app (the sliders button) let you mute words, choose which topics appear in **All**, and see if any source has stopped working.
 
@@ -30,4 +32,4 @@ Go to the **Actions** tab on GitHub, choose **Update my feed**, then **Run workf
 
 - Saved posts and muted words are kept on each device separately, so saving something on your phone won't show it on your laptop.
 - Some sites occasionally block automatic readers. If a source shows red in Settings for a few days, swap it for a Google News search on the same topic.
-- Wordle opens the official New York Times page. The button turns grey with a tick once you've played that day.
+- The **Games** button holds your daily puzzles (Wordle, Connections, Who Are Ya? and more). Each gets a tick once you've played that day. To add one, find `const GAMES` in `index.html` and copy a line.

@@ -7,6 +7,17 @@ import { createHash } from "node:crypto";
 const ROOT = new URL("..", import.meta.url);
 const config = JSON.parse(await readFile(new URL("feeds.json", ROOT), "utf8"));
 const MAX_AGE_DAYS = 7;
+
+// "people" in feeds.json: follow these names quietly in Celebs (and their photos in Pictures).
+const people = config.people || [];
+if (people.length) {
+  for (const name of people) {
+    const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    config.sources.push({ tab: "celebs", name: "Showbiz", url: `https://www.dailymail.co.uk/tvshowbiz/${slug}/index.rss`, pictures: true, max: 8, quiet: true });
+  }
+  const q = people.map((n) => `%22${encodeURIComponent(n).replace(/%20/g, "+")}%22`).join("+OR+");
+  config.sources.push({ tab: "celebs", name: "Showbiz news", url: `https://news.google.com/rss/search?q=(${q})+when:7d&hl=en-GB&gl=GB&ceid=GB:en`, max: 10, quiet: true });
+}
 const DEFAULT_MAX = 25;
 const FIXTURES = process.env.FIXTURES; // local testing only
 
@@ -120,6 +131,12 @@ async function load(src, i) {
     const out = items
       .map((it) => normalise(it, src))
       .filter((x) => x.title && x.link && (!x.date || Date.parse(x.date) > cutoff))
+      .filter((x) => {
+        const hay = (x.title + " " + x.summary).toLowerCase();
+        if (src.only && !src.only.some((w) => hay.includes(w.toLowerCase()))) return false;
+        if (src.skip && src.skip.some((w) => hay.includes(w.toLowerCase()))) return false;
+        return true;
+      })
       .slice(0, src.max || DEFAULT_MAX);
     return { name: src.name, tab: src.tab, ok: true, count: out.length, items: out };
   } catch (e) {

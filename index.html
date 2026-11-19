@@ -30,7 +30,8 @@
   .bar{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:0 16px 10px}
   .logo{font:700 22px/1 "Space Grotesk",sans-serif;letter-spacing:-.02em;
     background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .updated{color:var(--muted);font-size:12px;margin-right:auto}
+  .updated{color:var(--muted);font-size:12px;margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .logo,.icon-btn{white-space:nowrap;flex:none}
   .icon-btn{height:36px;min-width:36px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
     background:var(--panel2);border:1px solid var(--line);padding:0 10px}
   .icon-btn svg{width:18px;height:18px}
@@ -96,6 +97,14 @@
     background:var(--text);color:#000;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;transition:.2s;z-index:50;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%)}
   .more{height:1px}
+  .games{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+  @media(min-width:560px){.games{grid-template-columns:repeat(3,1fr)}}
+  .game{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);position:relative;min-height:96px}
+  .game .gi{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:700 16px "Space Grotesk",sans-serif;color:#000;margin-bottom:4px}
+  .game b{font-size:15px}
+  .game span{color:var(--muted);font-size:12.5px;line-height:1.3}
+  .game.done{opacity:.55}
+  .game.done:after{content:"✓";position:absolute;top:10px;right:12px;color:#4ade80;font-weight:700}
 </style>
 </head>
 <body>
@@ -103,7 +112,7 @@
   <div class="bar">
     <span class="logo">My Feed</span>
     <span class="updated" id="updated"></span>
-    <a class="icon-btn wordle" id="wordle" href="https://www.nytimes.com/games/wordle/index.html" target="_blank" rel="noopener">Wordle</a>
+    <button class="icon-btn wordle" id="gamesBtn">Games</button>
     <button class="icon-btn" id="refresh" aria-label="Refresh">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
     </button>
@@ -137,6 +146,14 @@
     <h3>Sources</h3>
     <p class="hint">A red one isn't working right now. If it stays red for a few days, remove it from feeds.json.</p>
     <div class="health" id="health"></div>
+  </div>
+</div>
+<div class="sheet" id="games">
+  <div class="sheet-inner">
+    <button class="icon-btn close" data-close aria-label="Close">✕</button>
+    <h2>Daily games</h2>
+    <p class="hint">A new puzzle every day. Each one gets a tick once you've played.</p>
+    <div class="games" id="gameList"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -173,12 +190,36 @@
   const toast = (msg) => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800); };
   const isMuted = (it) => { if (!muted.length) return false; const hay = (it.title + " " + it.summary + " " + it.source).toLowerCase(); return muted.some((w) => hay.includes(w.toLowerCase())); };
 
-  // Wordle: show as done once tapped today
+  // Daily games: each gets a tick once tapped today
+  const GAMES = [
+    ["Wordle", "Guess the five-letter word", "https://www.nytimes.com/games/wordle/index.html", "#6aaa64"],
+    ["Connections", "Find four groups of four", "https://www.nytimes.com/games/connections", "#b4a7d6"],
+    ["Strands", "Hunt for the themed words", "https://www.nytimes.com/games/strands", "#aedfee"],
+    ["The Mini", "A tiny crossword (free NYT login)", "https://www.nytimes.com/crosswords/game/mini", "#6493e6"],
+    ["Quick Crossword", "The Guardian's daily quickie", "https://www.theguardian.com/crosswords/series/quick", "#e5e7eb"],
+    ["Who Are Ya?", "Guess the footballer", "https://playfootball.games/who-are-ya/", "#ef4444"],
+    ["Bandle", "Guess the song, one instrument at a time", "https://bandle.app/", "#f59e0b"],
+    ["Framed", "Guess the film from stills", "https://framed.wtf/", "#c084fc"],
+    ["Waffle", "Swap letters to fix the grid", "https://wafflegame.net/daily", "#facc15"],
+    ["Worldle", "Guess the country from its shape", "https://worldle.teuteuf.fr/", "#34d399"],
+    ["Globle", "Find the mystery country", "https://globle-game.com/", "#22d3ee"],
+  ];
   const today = new Date().toDateString();
-  const wordle = $("#wordle");
-  const markWordle = () => { if (store.get("wordleDay") === today) { wordle.classList.add("done"); wordle.textContent = "Wordle ✓"; } };
-  wordle.addEventListener("click", () => { store.set("wordleDay", today); setTimeout(markWordle, 300); });
-  markWordle();
+  let played = store.get("played", {});
+  if (played.day !== today) played = { day: today, games: [] };
+  function renderGames() {
+    const n = played.games.length;
+    $("#gamesBtn").textContent = n ? `Games ${n}/${GAMES.length}` : "Games";
+    $("#gamesBtn").classList.toggle("done", n === GAMES.length);
+    $("#gameList").innerHTML = GAMES.map(([name, desc, url, col]) => `<a class="game ${played.games.includes(name) ? "done" : ""}" href="${url}" target="_blank" rel="noopener" data-game="${esc(name)}">
+      <span class="gi" style="background:${col}">${esc(name[0])}</span><b>${esc(name)}</b><span>${esc(desc)}</span></a>`).join("");
+  }
+  $("#gameList").addEventListener("click", (e) => {
+    const g = e.target.closest("[data-game]"); if (!g) return;
+    if (!played.games.includes(g.dataset.game)) played.games.push(g.dataset.game);
+    store.set("played", played); setTimeout(renderGames, 300);
+  });
+  renderGames();
 
   function renderTabs() {
     const tabs = [{ id: "all", name: "All" }, { id: "pictures", name: "Pictures" }, ...data.tabs, { id: "saved", name: "Saved" }];
@@ -291,9 +332,11 @@
   });
 
   // Settings sheet
-  const openSheet = () => { renderSettings(); $("#sheetBg").style.display = "block"; requestAnimationFrame(() => $("#sheet").classList.add("open")); };
-  const closeSheet = () => { $("#sheet").classList.remove("open"); setTimeout(() => ($("#sheetBg").style.display = "none"), 250); };
-  $("#settingsBtn").onclick = openSheet; $("#closeSheet").onclick = closeSheet; $("#sheetBg").onclick = closeSheet;
+  const openSheet = (id) => { if (id === "sheet") renderSettings(); $("#sheetBg").style.display = "block"; requestAnimationFrame(() => $("#" + id).classList.add("open")); };
+  const closeSheet = () => { document.querySelectorAll(".sheet.open").forEach((x) => x.classList.remove("open")); setTimeout(() => ($("#sheetBg").style.display = "none"), 250); };
+  $("#settingsBtn").onclick = () => openSheet("sheet"); $("#gamesBtn").onclick = () => { renderGames(); openSheet("games"); };
+  $("#closeSheet").onclick = closeSheet; $("#sheetBg").onclick = closeSheet;
+  document.querySelectorAll("[data-close]").forEach((b) => (b.onclick = closeSheet));
 
   function renderSettings() {
     $("#muteList").innerHTML = muted.length ? muted.map((w, i) => `<span class="chip">${esc(w)}<button data-unmute="${i}" aria-label="Unmute">×</button></span>`).join("") : `<span class="hint" style="color:var(--muted);font-size:13.5px">No muted words yet.</span>`;
@@ -314,7 +357,7 @@
     store.set("hiddenFromAll", hiddenFromAll); if (current === "all") render();
   };
 
-  function setUpdated() { if (data.updated) $("#updated").textContent = "Updated " + ago(data.updated) + (ago(data.updated) === "now" ? "" : " ago"); }
+  function setUpdated() { if (data.updated) { const a = ago(data.updated); $("#updated").textContent = a === "now" ? "just now" : a + " ago"; } }
 
   async function load(manual) {
     try {
