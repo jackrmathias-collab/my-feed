@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Feed</title>
-<meta name="theme-color" content="#0a0a0c">
+<meta name="theme-color" content="#07070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="My Feed">
@@ -13,149 +13,246 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0c; --panel:#141418; --panel2:#1c1c22; --line:#26262e;
-    --text:#f2f2f5; --muted:#8b8b98; --accent:#c084fc; --accent2:#22d3ee;
+    --bg:#07070a; --panel:#111116; --panel2:#18181f; --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+    --text:#f4f4f7; --muted:#8e8e9c; --dim:#5f5f6c; --accent:#c084fc; --accent2:#22d3ee; --hot:#fb7185;
     --safe-top:env(safe-area-inset-top,0px); --safe-bot:env(safe-area-inset-bottom,0px);
+    --r:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,-apple-system,sans-serif}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  body:before{content:"";position:fixed;inset:-20vh -20vw auto;height:70vh;z-index:-1;pointer-events:none;
+    background:radial-gradient(40vw 30vh at 15% 10%,rgba(192,132,252,.18),transparent 70%),radial-gradient(40vw 30vh at 90% 0%,rgba(34,211,238,.13),transparent 70%)}
   a{color:inherit;text-decoration:none}
-  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+  .wrap{max-width:720px;margin:0 auto}
 
-  header{position:sticky;top:0;z-index:20;background:rgba(10,10,12,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-    padding:calc(var(--safe-top) + 10px) 0 0;border-bottom:1px solid var(--line)}
-  .bar{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:0 16px 10px}
-  .logo{font:700 22px/1 "Space Grotesk",sans-serif;letter-spacing:-.02em;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .updated{color:var(--muted);font-size:12px;margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .logo,.icon-btn{white-space:nowrap;flex:none}
-  .icon-btn{height:36px;min-width:36px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
-    background:var(--panel2);border:1px solid var(--line);padding:0 10px}
-  .icon-btn svg{width:18px;height:18px}
-  .wordle{background:#538d4e;border-color:#538d4e;font-weight:600;font-size:13px;color:#fff}
-  .wordle.done{background:var(--panel2);border-color:var(--line);color:var(--muted)}
-  .tabs{max-width:680px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none}
+  header{position:sticky;top:0;z-index:20;background:rgba(7,7,10,.72);backdrop-filter:saturate(1.6) blur(20px);-webkit-backdrop-filter:saturate(1.6) blur(20px);
+    padding-top:var(--safe-top);border-bottom:1px solid var(--line);transition:transform .25s}
+  .bar{display:flex;align-items:center;gap:8px;padding:10px 16px 8px}
+  .logo{font:700 21px/1 "Space Grotesk",sans-serif;letter-spacing:-.03em;background:linear-gradient(95deg,#e9d5ff,var(--accent) 40%,var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+  .live{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;min-width:0;margin-right:auto}
+  .live i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:pulse 2s infinite;flex:none}
+  .live.stale i{background:#fbbf24;animation:none}
+  @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+  .ibtn{height:36px;min-width:36px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:none;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);padding:0 10px;white-space:nowrap}
+  .ibtn svg{width:18px;height:18px}
+  .ibtn:active{transform:scale(.95)}
+  .games-btn{background:linear-gradient(135deg,#538d4e,#3f7a3a);border-color:transparent;font-weight:700;font-size:13px;color:#fff;padding:0 12px 0 6px}
+  .ring{width:24px;height:24px}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 16px 10px;scrollbar-width:none;scroll-behavior:smooth}
   .tabs::-webkit-scrollbar{display:none}
-  .tab{flex:none;padding:7px 14px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--muted);font-weight:500;font-size:14px;white-space:nowrap}
-  .tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
-  .tab.on{background:var(--text);color:#000;border-color:var(--text)}
+  .tab{flex:none;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);font-weight:600;font-size:13.5px;white-space:nowrap;transition:.2s}
+  .tab .d{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .tab.on{color:#0b0b0f;border-color:transparent;background:var(--c,#fff);box-shadow:0 4px 20px -4px var(--c,#fff)}
+  .tab.on .d{background:#0b0b0f!important}
 
-  main{max-width:680px;margin:0 auto;padding:4px 0 calc(var(--safe-bot) + 40px)}
-  .card{display:block;padding:14px 16px;border-bottom:1px solid var(--line);position:relative}
-  .card:active{background:var(--panel)}
-  .meta{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:13px;margin-bottom:4px}
-  .meta .dot{width:8px;height:8px;border-radius:50%;flex:none}
-  .meta .src{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .meta .tabname{white-space:nowrap}
-  .title{font-weight:600;font-size:16.5px;line-height:1.35;margin:0 0 4px;letter-spacing:-.005em}
-  .summary{color:#b9b9c4;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14.5px}
-  .img{margin-top:10px;border-radius:14px;overflow:hidden;background:var(--panel2);border:1px solid var(--line);aspect-ratio:16/9}
-  .img{position:relative}
-  .img img{width:100%;height:100%;object-fit:cover;display:block}
-  .play{position:absolute;inset:0;margin:auto;width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
-  .play:after{content:"";border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:5px}
-  .actions{display:flex;gap:4px;margin-top:8px;margin-left:-8px}
-  .act{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;padding:6px 8px;border-radius:999px}
-  .act svg{width:18px;height:18px}
+  main{padding:0 0 calc(var(--safe-bot) + 60px)}
+
+  .hello{padding:18px 16px 6px}
+  .hello h1{font:700 27px/1.1 "Space Grotesk",sans-serif;letter-spacing:-.03em;margin:0}
+  .hello p{margin:6px 0 0;color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12.5px;color:var(--text);font-weight:500}
+  .pill.new{background:linear-gradient(90deg,rgba(192,132,252,.25),rgba(34,211,238,.2));border-color:rgba(192,132,252,.35)}
+
+  .sec{display:flex;align-items:baseline;justify-content:space-between;padding:22px 16px 10px}
+  .sec h2{font:700 18px "Space Grotesk",sans-serif;letter-spacing:-.02em;margin:0;display:flex;align-items:center;gap:8px}
+  .sec h2 .d{width:8px;height:8px;border-radius:50%}
+  .sec button,.sec a{color:var(--muted);font-size:13px;font-weight:600}
+
+  .rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 6px;scrollbar-width:none;scroll-padding:0 16px}
+  .rail::-webkit-scrollbar{display:none}
+  .hero{flex:none;width:86%;max-width:560px;aspect-ratio:4/3.1;border-radius:22px;overflow:hidden;position:relative;scroll-snap-align:start;background:var(--panel2);
+    box-shadow:0 20px 40px -20px rgba(0,0,0,.8);border:1px solid var(--line)}
+  @media(min-width:640px){.hero{aspect-ratio:16/9.5}}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.02);transition:transform 6s ease}
+  .hero:hover img{transform:scale(1.08)}
+  .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 60%,rgba(0,0,0,.92))}
+  .hero .txt{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 18px}
+  .hero h3{margin:8px 0 0;font:700 21px/1.18 "Space Grotesk",sans-serif;letter-spacing:-.02em;text-shadow:0 2px 12px rgba(0,0,0,.5);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;padding:4px 9px;border-radius:999px;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15)}
+  .chip .d{width:7px;height:7px;border-radius:50%}
+  .hero .src{font-size:12.5px;color:rgba(255,255,255,.8);margin-top:8px}
+  .dots{display:flex;justify-content:center;gap:5px;padding:4px 0 2px}
+  .dots i{width:5px;height:5px;border-radius:3px;background:var(--dim);transition:.25s}
+  .dots i.on{width:16px;background:var(--text)}
+
+  .card{display:block;margin:0 12px 10px;padding:14px;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));border:1px solid var(--line);position:relative;overflow:hidden;
+    opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease,background .2s}
+  .card.in{opacity:1;transform:none}
+  .card:active{background:rgba(255,255,255,.06)}
+  .row{display:flex;gap:12px;align-items:flex-start}
+  .row .body{flex:1;min-width:0}
+  .thumb{flex:none;width:92px;height:92px;border-radius:14px;overflow:hidden;background:var(--panel2);position:relative}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .meta{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12.5px;margin-bottom:6px;min-width:0}
+  .av{width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#0b0b0f;overflow:hidden}
+  .av img{width:100%;height:100%;object-fit:cover;background:#fff}
+  .meta .src{color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .meta .t{white-space:nowrap}
+  .newdot{width:7px;height:7px;border-radius:50%;background:var(--hot);box-shadow:0 0 10px var(--hot);flex:none}
+  .title{font-weight:650;font-size:16px;line-height:1.32;margin:0;letter-spacing:-.008em}
+  .summary{color:#a9a9b6;margin:5px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px}
+  .big .img{margin:12px 0 0;aspect-ratio:16/9;overflow:hidden;background:var(--panel2);position:relative;border-radius:12px}
+  .big .img img{width:100%;height:100%;object-fit:cover;display:block}
+  .big .title{font-size:18.5px;font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:-.015em}
+  .tag{position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0}
+  .actions{position:absolute;right:8px;bottom:6px;display:flex;gap:0}
+  .card{padding-bottom:34px}
+  .card.big{padding-bottom:40px}
+  .act{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px;font-weight:500;padding:6px 8px;border-radius:999px}
+  .act svg{width:17px;height:17px}
   .act.saved{color:var(--accent)}
   .act.saved svg{fill:currentColor}
+  .play{position:absolute;inset:0;margin:auto;width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.25)}
+  .play:after{content:"";border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
+  .thumb .play{width:34px;height:34px}
+  .thumb .play:after{border-left-width:11px;border-top-width:7px;border-bottom-width:7px;margin-left:3px}
 
-  .divider{display:flex;align-items:center;gap:10px;color:var(--accent);font-size:13px;font-weight:600;padding:14px 16px}
-  .divider:before,.divider:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
-  .empty{color:var(--muted);text-align:center;padding:60px 24px}
-  .empty b{display:block;color:var(--text);font-size:17px;margin-bottom:6px}
+  .vid{flex:none;width:68%;max-width:320px;scroll-snap-align:start}
+  .vid .im{aspect-ratio:16/9;border-radius:14px;overflow:hidden;position:relative;background:var(--panel2);border:1px solid var(--line)}
+  .vid img{width:100%;height:100%;object-fit:cover;display:block}
+  .vid b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;line-height:1.3;margin-top:8px;font-weight:600}
+  .vid span.s{color:var(--muted);font-size:12.5px}
+  .pic{flex:none;width:42%;max-width:220px;aspect-ratio:3/4;border-radius:16px;overflow:hidden;position:relative;scroll-snap-align:start;background:var(--panel2)}
+  .pic img{width:100%;height:100%;object-fit:cover}
+  .pic .cap{position:absolute;inset:auto 0 0;padding:30px 10px 10px;font-size:12px;font-weight:600;line-height:1.25;background:linear-gradient(transparent,rgba(0,0,0,.85));
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .read{flex:none;width:72%;max-width:330px;min-height:170px;border-radius:18px;padding:16px;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:space-between;gap:10px;
+    background:linear-gradient(145deg,#1e1b2e,#121219);border:1px solid var(--line2);position:relative;overflow:hidden}
+  .read:before{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(var(--c),transparent 70%);opacity:.35}
+  .read b{font:700 17px/1.25 "Space Grotesk",sans-serif;letter-spacing:-.01em;position:relative}
+  .read span{color:var(--muted);font-size:12.5px;position:relative}
+  .pod{flex:none;width:136px;scroll-snap-align:start}
+  .pod .im{width:136px;height:136px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#f59e0b,#7c3aed);border:1px solid var(--line)}
+  .pod img{width:100%;height:100%;object-fit:cover}
+  .pod b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.3;margin-top:7px;font-weight:600}
+  .pod span{color:var(--muted);font-size:12px}
+  .gchips{display:flex;gap:8px;overflow-x:auto;padding:4px 16px;scrollbar-width:none}
+  .gchips::-webkit-scrollbar{display:none}
+  .gchip{flex:none;display:flex;align-items:center;gap:8px;padding:7px 12px 7px 7px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:13.5px;font-weight:600}
+  .gchip i{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 13px "Space Grotesk",sans-serif;color:#000;font-style:normal}
+  .gchip.done{opacity:.45}
+  .gchip.done:after{content:"✓";color:#4ade80;margin-left:2px}
 
   .grid{columns:2;column-gap:8px;padding:8px}
   @media(min-width:640px){.grid{columns:3}}
-  .tile{display:block;break-inside:avoid;margin-bottom:8px;border-radius:14px;overflow:hidden;position:relative;background:var(--panel2)}
+  .tile{display:block;break-inside:avoid;margin-bottom:8px;border-radius:16px;overflow:hidden;position:relative;background:var(--panel2)}
   .tile img{width:100%;display:block}
-  .tile .cap{position:absolute;inset:auto 0 0 0;padding:28px 10px 9px;font-size:12.5px;font-weight:600;line-height:1.3;
-    background:linear-gradient(transparent,rgba(0,0,0,.85))}
+  .tile .cap{position:absolute;inset:auto 0 0 0;padding:30px 10px 9px;font-size:12.5px;font-weight:600;line-height:1.3;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+  .vgrid{display:grid;grid-template-columns:1fr;gap:18px;padding:8px 16px}
+  @media(min-width:560px){.vgrid{grid-template-columns:1fr 1fr}}
+  .vgrid .vid{width:auto;max-width:none}
+
+  .divider{display:flex;align-items:center;gap:10px;color:var(--accent);font-size:12.5px;font-weight:700;padding:16px 16px 14px;text-transform:uppercase;letter-spacing:.06em}
+  .divider:before,.divider:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+  .empty{color:var(--muted);text-align:center;padding:70px 24px}
+  .empty b{display:block;color:var(--text);font-size:17px;margin-bottom:6px}
+
+  .sk{margin:0 12px 10px;height:118px;border-radius:var(--r);background:linear-gradient(90deg,var(--panel) 0%,var(--panel2) 50%,var(--panel) 100%);background-size:200% 100%;animation:sh 1.3s infinite}
+  .sk.h{height:260px;margin:16px}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  .ptr{position:fixed;left:50%;top:calc(var(--safe-top) + 100px);transform:translate(-50%,-60px);opacity:0;z-index:30;width:38px;height:38px;border-radius:50%;
+    background:var(--panel2);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;transition:opacity .2s}
+  .ptr svg{width:18px;height:18px}
+  .ptr.spin svg{animation:rot .8s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
 
   .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none}
-  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:85vh;overflow:auto;background:var(--panel);border-top:1px solid var(--line);
-    border-radius:20px 20px 0 0;padding:18px 18px calc(var(--safe-bot) + 24px);transform:translateY(105%);transition:transform .25s ease}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;max-height:86vh;overflow:auto;background:var(--panel);border-top:1px solid var(--line2);
+    border-radius:24px 24px 0 0;padding:10px 18px calc(var(--safe-bot) + 24px);transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.9,.3,1)}
   .sheet.open{transform:none}
-  .sheet-inner{max-width:640px;margin:0 auto}
-  .sheet h2{font:700 20px "Space Grotesk",sans-serif;margin:0 0 4px}
-  .sheet h3{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:24px 0 8px}
-  .sheet p.hint{color:var(--muted);font-size:13.5px;margin:0 0 10px}
-  .row{display:flex;gap:8px}
-  .row input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--text);font:inherit}
-  .btn{background:var(--text);color:#000;border-radius:12px;padding:10px 16px;font-weight:600}
+  .sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--dim);margin:0 auto 12px}
+  .sheet-inner{max-width:640px;margin:0 auto;position:relative}
+  .sheet h2{font:700 22px "Space Grotesk",sans-serif;margin:0 0 4px;letter-spacing:-.02em}
+  .sheet h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 8px}
+  .hint{color:var(--muted);font-size:13.5px;margin:0 0 10px}
+  .frow{display:flex;gap:8px}
+  .frow input{flex:1;background:var(--bg);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;color:var(--text);font:inherit;min-width:0}
+  .btn{background:var(--text);color:#000;border-radius:12px;padding:10px 16px;font-weight:700}
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:5px 8px 5px 12px;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
-  .chip button{color:var(--muted);font-size:16px;line-height:1;padding:0 4px}
+  .mchip{background:var(--panel2);border:1px solid var(--line2);border-radius:999px;padding:5px 8px 5px 12px;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
+  .mchip button{color:var(--muted);font-size:16px;line-height:1;padding:0 4px}
   .toggle{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
   .toggle input{width:20px;height:20px;accent-color:var(--accent)}
-  .health{font-size:13.5px}
-  .health div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
-  .health .bad{color:#f87171}
-  .health .good{color:#4ade80}
-  .close{position:absolute;right:16px;top:14px}
-  .toast{position:fixed;left:50%;bottom:calc(var(--safe-bot) + 24px);transform:translateX(-50%) translateY(20px);opacity:0;
-    background:var(--text);color:#000;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;transition:.2s;z-index:50;pointer-events:none}
-  .toast.show{opacity:1;transform:translateX(-50%)}
-  .more{height:1px}
+  .health div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .bad{color:#f87171}.good{color:#4ade80}
+  .close{position:absolute;right:0;top:0}
   .games{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
   @media(min-width:560px){.games{grid-template-columns:repeat(3,1fr)}}
-  .game{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);position:relative;min-height:96px}
-  .game .gi{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:700 16px "Space Grotesk",sans-serif;color:#000;margin-bottom:4px}
+  .game{display:flex;flex-direction:column;gap:3px;padding:14px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);position:relative;min-height:100px}
+  .game .gi{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font:700 17px "Space Grotesk",sans-serif;color:#000;margin-bottom:6px}
   .game b{font-size:15px}
   .game span{color:var(--muted);font-size:12.5px;line-height:1.3}
-  .game.done{opacity:.55}
-  .game.done:after{content:"✓";position:absolute;top:10px;right:12px;color:#4ade80;font-weight:700}
+  .game.done{opacity:.5}
+  .game.done:after{content:"✓";position:absolute;top:10px;right:12px;color:#4ade80;font-weight:800}
+  .toast{position:fixed;left:50%;bottom:calc(var(--safe-bot) + 24px);transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--text);color:#000;padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px;transition:.25s;z-index:50;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .more{height:1px}
+  .top-btn{position:fixed;right:16px;bottom:calc(var(--safe-bot) + 18px);z-index:25;width:44px;height:44px;border-radius:50%;background:var(--text);color:#000;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transform:scale(.8);transition:.2s;pointer-events:none}
+  .top-btn.show{opacity:1;transform:none;pointer-events:auto}
+  .top-btn svg{width:20px;height:20px}
 </style>
 </head>
 <body>
-<header>
-  <div class="bar">
-    <span class="logo">My Feed</span>
-    <span class="updated" id="updated"></span>
-    <button class="icon-btn wordle" id="gamesBtn">Games</button>
-    <button class="icon-btn" id="refresh" aria-label="Refresh">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-    </button>
-    <button class="icon-btn" id="settingsBtn" aria-label="Settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-    </button>
+<header id="hdr">
+  <div class="wrap">
+    <div class="bar">
+      <span class="logo">My Feed</span>
+      <span class="live" id="live"><i></i><span id="updated">Loading…</span></span>
+      <button class="ibtn games-btn" id="gamesBtn" aria-label="Daily games"></button>
+      <button class="ibtn" id="searchBtn" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+      <button class="ibtn" id="settingsBtn" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      </button>
+    </div>
+    <div class="frow" id="searchRow" style="display:none;padding:0 16px 10px"><input id="searchInput" placeholder="Search everything…" autocomplete="off" enterkeyhint="search"></div>
+    <nav class="tabs" id="tabs"></nav>
   </div>
-  <nav class="tabs" id="tabs"></nav>
 </header>
+<div class="ptr" id="ptr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
 
-<main id="main"><div class="empty"><b>Loading your feed…</b></div></main>
+<main class="wrap" id="main">
+  <div class="sk h"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div>
+</main>
+
+<button class="top-btn" id="topBtn" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <div class="sheet-bg" id="sheetBg"></div>
-<div class="sheet" id="sheet">
+<div class="sheet" id="settings">
+  <div class="grab"></div>
   <div class="sheet-inner">
-    <button class="icon-btn close" id="closeSheet" aria-label="Close">✕</button>
+    <button class="ibtn close" data-close aria-label="Close">✕</button>
     <h2>Settings</h2>
-
     <h3>Mute words</h3>
-    <p class="hint">Posts that mention any of these words are hidden everywhere.</p>
-    <form class="row" id="muteForm">
-      <input id="muteInput" placeholder="e.g. Love Island" autocomplete="off">
-      <button class="btn" type="submit">Mute</button>
-    </form>
+    <p class="hint">Posts that mention any of these are hidden everywhere.</p>
+    <form class="frow" id="muteForm"><input id="muteInput" placeholder="e.g. Love Island" autocomplete="off"><button class="btn" type="submit">Mute</button></form>
     <div class="chips" id="muteList"></div>
-
-    <h3>Show in the All feed</h3>
+    <h3>Show in For You</h3>
     <p class="hint">Turn a topic off to keep it in its own tab only.</p>
     <div id="allToggles"></div>
-
     <h3>Sources</h3>
-    <p class="hint">A red one isn't working right now. If it stays red for a few days, remove it from feeds.json.</p>
+    <p class="hint">Red means a source isn't working right now. If it stays red for a few days, swap it in feeds.json.</p>
     <div class="health" id="health"></div>
   </div>
 </div>
 <div class="sheet" id="games">
+  <div class="grab"></div>
   <div class="sheet-inner">
-    <button class="icon-btn close" data-close aria-label="Close">✕</button>
+    <button class="ibtn close" data-close aria-label="Close">✕</button>
     <h2>Daily games</h2>
-    <p class="hint">A new puzzle every day. Each one gets a tick once you've played.</p>
+    <p class="hint">A fresh puzzle every day. Each one gets a tick once you've played.</p>
     <div class="games" id="gameList"></div>
   </div>
 </div>
@@ -163,37 +260,47 @@
 
 <script>
 (() => {
-  const $ = (s) => document.querySelector(s);
+  const $ = (s, el = document) => el.querySelector(s);
   const store = {
     get(k, d) { try { const v = localStorage.getItem("myfeed:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
     set(k, v) { try { localStorage.setItem("myfeed:" + k, JSON.stringify(v)); } catch {} },
   };
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   let data = { items: [], tabs: [], health: [] };
   let current = location.hash.slice(1) || "all";
-  let saved = store.get("saved", {});        // id -> item
+  let query = "";
+  let saved = store.get("saved", {});
   let muted = store.get("muted", []);
   let hiddenFromAll = store.get("hiddenFromAll", []);
   const prevVisit = store.get("lastVisit", null);
   store.set("lastVisit", new Date().toISOString());
-  let list = [], shown = 0;
-  const PAGE = 30;
+  let list = [], shown = 0, railQueue = [], rendered = false;
+  const PAGE = 24;
 
-  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const tabInfo = (id) => data.tabs.find((t) => t.id === id) || { name: id, colour: "#888" };
+  const tabInfo = (id) => data.tabs.find((t) => t.id === id) || { id, name: id, colour: "#888" };
   const ago = (iso) => {
     if (!iso) return "";
     const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
-    if (m < 1) return "now";
-    if (m < 60) return m + "m";
-    if (m < 1440) return Math.round(m / 60) + "h";
-    const d = Math.round(m / 1440);
-    return d < 7 ? d + "d" : new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    if (m < 1) return "now"; if (m < 60) return m + "m"; if (m < 1440) return Math.round(m / 60) + "h";
+    const d = Math.round(m / 1440); return d < 7 ? d + "d" : new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
   };
+  const isNew = (it) => prevVisit && it.date && it.date > prevVisit;
+  const isVideo = (it) => /youtube\.com\/(watch|shorts)/.test(it.link || "");
   const toast = (msg) => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800); };
-  const isMuted = (it) => { if (!muted.length) return false; const hay = (it.title + " " + it.summary + " " + it.source).toLowerCase(); return muted.some((w) => hay.includes(w.toLowerCase())); };
+  const isMuted = (it) => muted.length && muted.some((w) => (it.title + " " + it.summary + " " + it.source).toLowerCase().includes(w.toLowerCase()));
+  const img = (src) => `<img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${esc(src)}" alt="" onerror="var w=this.closest('[data-imgwrap]');if(w)w.remove();else this.remove()">`;
 
-  // Daily games: each gets a tick once tapped today
+  // Little logo for each source (site icon, or a coloured letter)
+  function avatar(it) {
+    const t = tabInfo(it.tab);
+    let host = ""; try { host = new URL(it.link).hostname; } catch {}
+    const letter = esc((it.source || "?").replace(/^the\s+/i, "")[0].toUpperCase());
+    if (!host || /news\.google|feeds\.|megaphone|acast/.test(host)) return `<span class="av" style="background:${t.colour}">${letter}</span>`;
+    return `<span class="av" style="background:${t.colour}">${letter}<img style="position:absolute;width:20px;height:20px" src="https://www.google.com/s2/favicons?domain=${host}&sz=64" alt="" loading="lazy" onerror="this.remove()"></span>`;
+  }
+
+  // ---------- Games ----------
   const GAMES = [
     ["Wordle", "Guess the five-letter word", "https://www.nytimes.com/games/wordle/index.html", "#6aaa64"],
     ["Connections", "Find four groups of four", "https://www.nytimes.com/games/connections", "#b4a7d6"],
@@ -210,89 +317,154 @@
   const today = new Date().toDateString();
   let played = store.get("played", {});
   if (played.day !== today) played = { day: today, games: [] };
+  const gameChips = () => GAMES.map(([name, , url, col]) => `<a class="gchip ${played.games.includes(name) ? "done" : ""}" href="${url}" target="_blank" rel="noopener" data-game="${esc(name)}"><i style="background:${col}">${esc(name[0])}</i>${esc(name)}</a>`).join("");
   function renderGames() {
-    const n = played.games.length;
-    $("#gamesBtn").textContent = n ? `Games ${n}/${GAMES.length}` : "Games";
-    $("#gamesBtn").classList.toggle("done", n === GAMES.length);
+    const n = played.games.length, pct = n / GAMES.length, C = 2 * Math.PI * 9;
+    $("#gamesBtn").innerHTML = `<svg class="ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/>
+      <circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${C * pct} ${C}" transform="rotate(-90 12 12)"/></svg>${n ? `${n}/${GAMES.length}` : "Games"}`;
     $("#gameList").innerHTML = GAMES.map(([name, desc, url, col]) => `<a class="game ${played.games.includes(name) ? "done" : ""}" href="${url}" target="_blank" rel="noopener" data-game="${esc(name)}">
       <span class="gi" style="background:${col}">${esc(name[0])}</span><b>${esc(name)}</b><span>${esc(desc)}</span></a>`).join("");
+    const g = $("#gchips"); if (g) g.innerHTML = gameChips();
   }
-  $("#gameList").addEventListener("click", (e) => {
-    const g = e.target.closest("[data-game]"); if (!g) return;
-    if (!played.games.includes(g.dataset.game)) played.games.push(g.dataset.game);
-    store.set("played", played); setTimeout(renderGames, 300);
-  });
   renderGames();
 
+  // ---------- Weather (free, no sign-up) ----------
+  let weather = "";
+  const WX = { 0: "clear skies", 1: "mostly clear", 2: "partly cloudy", 3: "cloudy", 45: "foggy", 48: "foggy", 51: "drizzly", 53: "drizzly", 55: "drizzly", 61: "light rain", 63: "rainy", 65: "heavy rain",
+    71: "light snow", 73: "snowy", 75: "heavy snow", 80: "showery", 81: "showery", 82: "heavy showers", 95: "stormy" };
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=51.46&longitude=-0.03&current=temperature_2m,weather_code&timezone=Europe%2FLondon")
+    .then((r) => r.json()).then((w) => { const c = w.current; weather = `${Math.round(c.temperature_2m)}°, ${WX[c.weather_code] || "mixed"}`; const el = $("#wx"); if (el) el.textContent = weather; }).catch(() => {});
+
+  // ---------- Tabs ----------
   function renderTabs() {
-    const tabs = [{ id: "all", name: "All" }, { id: "pictures", name: "Pictures" }, ...data.tabs, { id: "saved", name: "Saved" }];
+    const tabs = [{ id: "all", name: "For You", colour: "#ffffff" }, { id: "pictures", name: "Pictures", colour: "#fda4af" }, ...data.tabs, { id: "saved", name: "Saved", colour: "#c084fc" }];
     $("#tabs").innerHTML = tabs.map((t) =>
-      `<button class="tab ${t.id === current ? "on" : ""}" data-tab="${t.id}">${t.colour ? `<span class="dot" style="background:${t.colour}"></span>` : ""}${esc(t.name)}</button>`
+      `<button class="tab ${t.id === current ? "on" : ""}" style="--c:${t.colour}" data-tab="${t.id}">${!["all", "saved", "pictures"].includes(t.id) ? `<span class="d" style="background:${t.colour}"></span>` : ""}${esc(t.name)}</button>`
     ).join("");
     const on = $("#tabs .on"); if (on) on.scrollIntoView({ inline: "center", block: "nearest" });
   }
 
-  // Stops one busy source taking over the All feed
   function spreadOut(items) {
     const out = [], pool = items.slice();
     while (pool.length) {
-      const last = out.slice(-2).map((x) => x.source);
-      let i = pool.findIndex((x, n) => n < 6 && !last.includes(x.source));
+      const last = out.slice(-2).map((x) => x.source), lastTab = out.slice(-1).map((x) => x.tab);
+      let i = pool.findIndex((x, n) => n < 8 && !last.includes(x.source) && !lastTab.includes(x.tab));
+      if (i < 0) i = pool.findIndex((x, n) => n < 8 && !last.includes(x.source));
       if (i < 0) i = 0;
       out.push(pool.splice(i, 1)[0]);
     }
     return out;
   }
+  const visible = () => data.items.filter((it) => !isMuted(it));
 
-  function build() {
-    const visible = data.items.filter((it) => !isMuted(it));
-    if (current === "all") return spreadOut(visible.filter((it) => !hiddenFromAll.includes(it.tab)));
-    if (current === "pictures") return visible.filter((it) => it.pictures && it.image);
-    if (current === "saved") return Object.values(saved).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
-    return visible.filter((it) => it.tab === current);
-  }
-
+  // ---------- Building blocks ----------
   const bookmarkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>`;
   const shareSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v13M7 8l5-5 5 5M5 14v6h14v-6"/></svg>`;
+  const actions = (it) => { const s = !!saved[it.id]; return `<div class="actions"><button class="act ${s ? "saved" : ""}" data-save="${it.id}" aria-label="Save">${bookmarkSvg}</button><button class="act" data-share="${it.id}" aria-label="Share">${shareSvg}</button></div>`; };
+  function meta(it) {
+    const t = tabInfo(it.tab);
+    return `<div class="meta"><span style="position:relative;display:flex">${avatar(it)}</span><span class="src">${esc(it.source)}</span>${current === "all" || query ? `<span class="t" style="color:${t.colour}">${esc(t.name)}</span>` : ""}<span class="t">· ${ago(it.date)}</span>${isNew(it) ? `<span class="newdot" title="New"></span>` : ""}</div>`;
+  }
+  function card(it, n) {
+    const t = tabInfo(it.tab);
+    const big = it.image && (n % 4 === 0 || isVideo(it));
+    if (big) return `<article class="card big"><span class="tag" style="background:${t.colour}"></span>
+      <a href="${esc(it.link)}" target="_blank" rel="noopener">${meta(it)}<h3 class="title">${esc(it.title)}</h3>${it.summary ? `<p class="summary">${esc(it.summary)}</p>` : ""}
+      <div class="img" data-imgwrap>${img(it.image)}${isVideo(it) ? `<span class="play"></span>` : ""}</div></a>${actions(it)}</article>`;
+    return `<article class="card"><span class="tag" style="background:${t.colour}"></span><a href="${esc(it.link)}" target="_blank" rel="noopener" class="row">
+      <div class="body">${meta(it)}<h3 class="title">${esc(it.title)}</h3>${!it.image && it.summary ? `<p class="summary">${esc(it.summary)}</p>` : ""}</div>
+      ${it.image ? `<div class="thumb" data-imgwrap>${img(it.image)}${isVideo(it) ? `<span class="play"></span>` : ""}</div>` : ""}</a>${actions(it)}</article>`;
+  }
+  const hero = (it) => { const t = tabInfo(it.tab); return `<a class="hero" href="${esc(it.link)}" target="_blank" rel="noopener" data-imgwrap>${img(it.image)}<div class="shade"></div>
+    <div class="txt"><span class="chip"><span class="d" style="background:${t.colour}"></span>${esc(t.name)}</span><h3>${esc(it.title)}</h3><div class="src">${esc(it.source)} · ${ago(it.date)}</div></div>${isVideo(it) ? `<span class="play"></span>` : ""}</a>`; };
+  const vid = (it, play = true) => `<a class="vid" href="${esc(it.link)}" target="_blank" rel="noopener"><div class="im">${img(it.image)}${play ? `<span class="play"></span>` : ""}</div><b>${esc(it.title)}</b><span class="s">${esc(it.source)} · ${ago(it.date)}</span></a>`;
+  const pic = (it) => `<a class="pic" href="${esc(it.link)}" target="_blank" rel="noopener" data-imgwrap>${img(it.image)}<div class="cap">${esc(it.title)}</div></a>`;
+  const read = (it) => `<a class="read" style="--c:${tabInfo(it.tab).colour}" href="${esc(it.link)}" target="_blank" rel="noopener"><span>${esc(it.source)}</span><b>${esc(it.title)}</b><span>${ago(it.date)} ago · grab a cuppa</span></a>`;
+  const pod = (it) => `<a class="pod" href="${esc(it.link)}" target="_blank" rel="noopener"><div class="im">${it.image ? img(it.image) : ""}</div><b>${esc(it.title)}</b><span>${esc(it.source)}</span></a>`;
+  const section = (title, colour, tab, inner) =>
+    `<div class="sec"><h2>${colour ? `<span class="d" style="background:${colour}"></span>` : ""}${esc(title)}</h2>${tab ? `<button data-tab="${tab}">See all →</button>` : ""}</div><div class="rail">${inner}</div>`;
 
-  function card(it) {
-    const t = tabInfo(it.tab), isSaved = !!saved[it.id];
-    return `<article class="card">
-      <a href="${esc(it.link)}" target="_blank" rel="noopener">
-        <div class="meta"><span class="dot" style="background:${t.colour}"></span><span class="src">${esc(it.source)}</span>
-          <span class="tabname">· ${esc(t.name)}</span><span>· ${ago(it.date)}</span></div>
-        <h2 class="title">${esc(it.title)}</h2>
-        ${it.summary ? `<p class="summary">${esc(it.summary)}</p>` : ""}
-        ${it.image ? `<div class="img"><img loading="lazy" referrerpolicy="no-referrer" src="${esc(it.image)}" alt="" onerror="this.parentNode.remove()">${/youtube\.com\/(watch|shorts)/.test(it.link) ? '<span class="play"></span>' : ""}</div>` : ""}
-      </a>
-      <div class="actions">
-        <button class="act ${isSaved ? "saved" : ""}" data-save="${it.id}">${bookmarkSvg}${isSaved ? "Saved" : "Save"}</button>
-        <button class="act" data-share="${it.id}">${shareSvg}Share</button>
-      </div>
-    </article>`;
+  // Rails dropped into the For You feed every few posts
+  function rails(v) {
+    const r = [];
+    const vids = v.filter((x) => x.tab === "youtube" && x.image).slice(0, 10);
+    if (vids.length) r.push(section("Watch", tabInfo("youtube").colour, "youtube", vids.map((x) => vid(x)).join("")));
+    const pics = v.filter((x) => x.pictures && x.image).slice(0, 14);
+    if (pics.length) r.push(section("Looking good", "#fda4af", "pictures", pics.map(pic).join("")));
+    const reads = v.filter((x) => x.tab === "longreads").slice(0, 8);
+    if (reads.length) r.push(section("Long reads", "#e5e7eb", "longreads", reads.map(read).join("")));
+    const film = v.filter((x) => x.tab === "film" && x.image).slice(0, 10);
+    if (film.length) r.push(section("On screen", tabInfo("film").colour, "film", film.map(pic).join("")));
+    const pods = v.filter((x) => x.tab === "podcasts").slice(0, 10);
+    if (pods.length) r.push(section("New episodes", tabInfo("podcasts").colour, "podcasts", pods.map(pod).join("")));
+    const ars = v.filter((x) => x.tab === "arsenal" && x.image).slice(0, 8);
+    if (ars.length) r.push(section("Gooners", tabInfo("arsenal").colour, "arsenal", ars.map((x) => vid(x, false)).join("")));
+    return r;
   }
 
-  function tile(it) {
-    return `<a class="tile" href="${esc(it.link)}" target="_blank" rel="noopener">
-      <img loading="lazy" referrerpolicy="no-referrer" src="${esc(it.image)}" alt="" onerror="this.parentNode.remove()">
-      <div class="cap">${esc(it.title)}</div></a>`;
+  function greeting() {
+    const h = new Date().getHours();
+    const part = h < 5 ? "Up late" : h < 12 ? "Morning" : h < 18 ? "Afternoon" : "Evening";
+    const newCount = prevVisit ? data.items.filter((x) => isNew(x) && !isMuted(x) && !hiddenFromAll.includes(x.tab)).length : 0;
+    const date = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+    return `<div class="hello"><h1>${part}, Jack</h1><p><span>${date}</span><span id="wx">${esc(weather)}</span>${newCount ? `<span class="pill new">✦ ${newCount} new since you last looked</span>` : ""}</p></div>`;
+  }
+  function heroes(v) {
+    const seen = new Set(), out = [];
+    for (const it of v) { if (!it.image || isVideo(it) || seen.has(it.tab) || it.tab === "podcasts") continue; seen.add(it.tab); out.push(it); if (out.length >= 7) break; }
+    return out;
   }
 
+  // ---------- Render ----------
   function render() {
     renderTabs();
-    list = build(); shown = 0;
-    const main = $("#main");
-    if (!list.length) {
+    const main = $("#main"), v = visible();
+    let html = "";
+    shown = 0; railQueue = [];
+    if (query) {
+      const q = query.toLowerCase();
+      list = v.filter((it) => (it.title + " " + it.summary + " " + it.source).toLowerCase().includes(q));
+      html = `<div class="sec"><h2>${list.length} results for “${esc(query)}”</h2></div>`;
+    } else if (current === "all") {
+      const pool = v.filter((it) => !hiddenFromAll.includes(it.tab));
+      const tops = heroes(pool);
+      html = greeting();
+      if (tops.length) html += `<div class="rail" id="heroRail">${tops.map(hero).join("")}</div><div class="dots" id="dots">${tops.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`;
+      html += `<div class="sec"><h2>Today's games</h2><button data-open-games>All →</button></div><div class="gchips" id="gchips">${gameChips()}</div>`;
+      html += `<div class="sec"><h2>Latest</h2></div>`;
+      const topIds = new Set(tops.map((x) => x.id));
+      list = spreadOut(pool.filter((x) => !topIds.has(x.id) && x.tab !== "youtube" && x.tab !== "podcasts"));
+      railQueue = rails(pool);
+    } else if (current === "pictures") {
+      list = v.filter((it) => it.pictures && it.image);
+      html = `<div class="grid" id="list"></div>`;
+    } else if (current === "saved") {
+      list = Object.values(saved).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+    } else if (current === "youtube") {
+      list = v.filter((it) => it.tab === "youtube");
+      html = `<div class="vgrid" id="list"></div>`;
+    } else {
+      const t = tabInfo(current);
+      list = v.filter((it) => it.tab === current);
+      const tops = list.filter((x) => x.image).slice(0, 4);
+      html += `<div class="sec"><h2><span class="d" style="background:${t.colour}"></span>${esc(t.name)}</h2><span style="color:var(--muted);font-size:13px">${list.length} posts</span></div>`;
+      if (tops.length > 1) {
+        html += `<div class="rail">${tops.map(hero).join("")}</div><div class="sec"><h2>More</h2></div>`;
+        const ids = new Set(tops.map((x) => x.id)); list = list.filter((x) => !ids.has(x.id));
+      }
+    }
+    if (!list.length && current !== "all") {
       const msg = current === "saved" ? ["Nothing saved yet", "Tap Save on any post to keep it here for later."]
-        : data.items.length ? ["Nothing here right now", "Check back soon, or look at your muted words."]
-        : ["No posts yet", "Your feed fills up after the first automatic refresh."];
-      main.innerHTML = `<div class="empty"><b>${msg[0]}</b>${msg[1]}</div>`;
+        : query ? ["No matches", "Try a different word."] : data.items.length ? ["Quiet here right now", "Check back soon, or look at your muted words."] : ["No posts yet", "Your feed fills up after the first automatic refresh."];
+      main.innerHTML = html + `<div class="empty"><b>${msg[0]}</b>${msg[1]}</div>`;
       return;
     }
-    main.innerHTML = current === "pictures" ? `<div class="grid" id="list"></div><div class="more" id="more"></div>` : `<div id="list"></div><div class="more" id="more"></div>`;
+    if (!html.includes('id="list"')) html += `<div id="list"></div>`;
+    main.innerHTML = html + `<div class="more" id="more"></div>`;
     more();
     observer.disconnect(); observer.observe($("#more"));
-    window.scrollTo(0, 0);
+    const hr = $("#heroRail");
+    if (hr) hr.addEventListener("scroll", () => { const i = Math.round(hr.scrollLeft / (hr.firstElementChild.offsetWidth + 10)); document.querySelectorAll("#dots i").forEach((d, n) => d.classList.toggle("on", n === i)); }, { passive: true });
   }
 
   function more() {
@@ -300,31 +472,34 @@
     const chunk = list.slice(shown, shown + PAGE);
     let html = "";
     for (const it of chunk) {
-      // "Caught up" line where the posts you've already seen begin (All feed only)
-      if (current === "all" && prevVisit && !el._dividerDone && it.date && it.date < prevVisit && shown > 0) {
-        html += `<div class="divider">You're all caught up</div>`; el._dividerDone = true;
-      }
-      html += current === "pictures" ? tile(it) : card(it);
+      if (current === "all" && !query && prevVisit && !el._div && it.date && it.date < prevVisit && shown > 3) { html += `<div class="divider">You're all caught up</div>`; el._div = true; }
+      if (current === "pictures" && !query) html += `<a class="tile" href="${esc(it.link)}" target="_blank" rel="noopener" data-imgwrap>${img(it.image)}<div class="cap">${esc(it.title)}</div></a>`;
+      else if (current === "youtube" && !query) html += vid(it);
+      else html += card(it, shown);
       shown++;
+      if (current === "all" && !query && shown % 7 === 0 && railQueue.length) html += railQueue.shift();
     }
     el.insertAdjacentHTML("beforeend", html);
+    el.querySelectorAll(".card:not(.in)").forEach((c) => fade.observe(c));
   }
-  const observer = new IntersectionObserver((e) => { if (e[0].isIntersecting && shown < list.length) more(); }, { rootMargin: "800px" });
+  const observer = new IntersectionObserver((e) => { if (e[0].isIntersecting && shown < list.length) more(); }, { rootMargin: "900px" });
+  const fade = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); fade.unobserve(e.target); } }), { rootMargin: "0px 0px -20px 0px" });
 
-  $("#tabs").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-tab]"); if (!b) return;
-    current = b.dataset.tab; history.replaceState(null, "", current === "all" ? location.pathname : "#" + current); render();
-  });
-
-  $("#main").addEventListener("click", async (e) => {
+  // ---------- Events ----------
+  document.addEventListener("click", async (e) => {
+    const g = e.target.closest("[data-game]");
+    if (g) { if (!played.games.includes(g.dataset.game)) played.games.push(g.dataset.game); store.set("played", played); setTimeout(renderGames, 300); return; }
+    const tb = e.target.closest("[data-tab]");
+    if (tb) { current = tb.dataset.tab; query = ""; $("#searchInput").value = ""; $("#searchRow").style.display = "none"; history.replaceState(null, "", current === "all" ? location.pathname : "#" + current); render(); scrollTo({ top: 0 }); return; }
+    if (e.target.closest("[data-open-games]")) { renderGames(); openSheet("games"); return; }
     const s = e.target.closest("[data-save]");
     if (s) {
       const id = s.dataset.save;
       if (saved[id]) { delete saved[id]; toast("Removed from Saved"); }
-      else { const it = data.items.find((x) => x.id === id); if (it) { saved[id] = { ...it, savedAt: Date.now() }; toast("Saved for later"); } }
+      else { const it = data.items.find((x) => x.id === id); if (it) { saved[id] = { ...it, savedAt: Date.now() }; toast("Saved for later ✦"); } }
       store.set("saved", saved);
       if (current === "saved") return render();
-      s.classList.toggle("saved", !!saved[id]); s.innerHTML = bookmarkSvg + (saved[id] ? "Saved" : "Save");
+      s.classList.toggle("saved", !!saved[id]);
       return;
     }
     const sh = e.target.closest("[data-share]");
@@ -334,49 +509,69 @@
     }
   });
 
-  // Settings sheet
-  const openSheet = (id) => { if (id === "sheet") renderSettings(); $("#sheetBg").style.display = "block"; requestAnimationFrame(() => $("#" + id).classList.add("open")); };
-  const closeSheet = () => { document.querySelectorAll(".sheet.open").forEach((x) => x.classList.remove("open")); setTimeout(() => ($("#sheetBg").style.display = "none"), 250); };
-  $("#settingsBtn").onclick = () => openSheet("sheet"); $("#gamesBtn").onclick = () => { renderGames(); openSheet("games"); };
-  $("#closeSheet").onclick = closeSheet; $("#sheetBg").onclick = closeSheet;
+  $("#searchBtn").onclick = () => { const r = $("#searchRow"); const open = r.style.display === "none"; r.style.display = open ? "flex" : "none"; if (open) $("#searchInput").focus(); else { query = ""; $("#searchInput").value = ""; render(); } };
+  let st; $("#searchInput").addEventListener("input", (e) => { clearTimeout(st); st = setTimeout(() => { query = e.target.value.trim(); render(); }, 250); });
+
+  const openSheet = (id) => { if (id === "settings") renderSettings(); $("#sheetBg").style.display = "block"; requestAnimationFrame(() => $("#" + id).classList.add("open")); };
+  const closeSheet = () => { document.querySelectorAll(".sheet.open").forEach((x) => x.classList.remove("open")); setTimeout(() => ($("#sheetBg").style.display = "none"), 280); };
+  $("#settingsBtn").onclick = () => openSheet("settings");
+  $("#gamesBtn").onclick = () => { renderGames(); openSheet("games"); };
+  $("#sheetBg").onclick = closeSheet;
   document.querySelectorAll("[data-close]").forEach((b) => (b.onclick = closeSheet));
 
   function renderSettings() {
-    $("#muteList").innerHTML = muted.length ? muted.map((w, i) => `<span class="chip">${esc(w)}<button data-unmute="${i}" aria-label="Unmute">×</button></span>`).join("") : `<span class="hint" style="color:var(--muted);font-size:13.5px">No muted words yet.</span>`;
-    $("#allToggles").innerHTML = data.tabs.map((t) => `<label class="toggle"><span><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.colour};margin-right:8px"></span>${esc(t.name)}</span>
+    $("#muteList").innerHTML = muted.length ? muted.map((w, i) => `<span class="mchip">${esc(w)}<button data-unmute="${i}" aria-label="Unmute">×</button></span>`).join("") : `<span class="hint">No muted words yet.</span>`;
+    $("#allToggles").innerHTML = data.tabs.map((t) => `<label class="toggle"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${t.colour};margin-right:8px"></span>${esc(t.name)}</span>
       <input type="checkbox" data-alltab="${t.id}" ${hiddenFromAll.includes(t.id) ? "" : "checked"}></label>`).join("");
     $("#health").innerHTML = (data.health || []).map((h) => `<div><span>${esc(h.name)} <span style="color:var(--muted)">· ${esc(tabInfo(h.tab).name)}</span></span>
-      ${h.ok ? `<span class="good">✓ ${h.count}</span>` : `<span class="bad" title="${esc(h.error)}">✗ not working</span>`}</div>`).join("");
+      ${h.ok ? `<span class="good">✓ ${h.count}</span>` : `<span class="bad" title="${esc(h.error || "")}">✗ not working</span>`}</div>`).join("");
   }
-  $("#muteForm").onsubmit = (e) => {
-    e.preventDefault(); const w = $("#muteInput").value.trim(); if (!w) return;
-    if (!muted.some((m) => m.toLowerCase() === w.toLowerCase())) muted.push(w);
-    store.set("muted", muted); $("#muteInput").value = ""; renderSettings(); render();
-  };
+  $("#muteForm").onsubmit = (e) => { e.preventDefault(); const w = $("#muteInput").value.trim(); if (!w) return; if (!muted.some((m) => m.toLowerCase() === w.toLowerCase())) muted.push(w); store.set("muted", muted); $("#muteInput").value = ""; renderSettings(); render(); };
   $("#muteList").onclick = (e) => { const b = e.target.closest("[data-unmute]"); if (!b) return; muted.splice(+b.dataset.unmute, 1); store.set("muted", muted); renderSettings(); render(); };
-  $("#allToggles").onchange = (e) => {
-    const id = e.target.dataset.alltab; if (!id) return;
-    hiddenFromAll = e.target.checked ? hiddenFromAll.filter((x) => x !== id) : [...hiddenFromAll, id];
-    store.set("hiddenFromAll", hiddenFromAll); if (current === "all") render();
-  };
+  $("#allToggles").onchange = (e) => { const id = e.target.dataset.alltab; if (!id) return; hiddenFromAll = e.target.checked ? hiddenFromAll.filter((x) => x !== id) : [...hiddenFromAll, id]; store.set("hiddenFromAll", hiddenFromAll); if (current === "all") render(); };
 
-  function setUpdated() { if (data.updated) { const a = ago(data.updated); $("#updated").textContent = a === "now" ? "just now" : a + " ago"; } }
+  // Header tucks away as you scroll down; back-to-top button
+  let lastY = 0;
+  addEventListener("scroll", () => {
+    const y = scrollY;
+    $("#hdr").style.transform = y > 160 && y > lastY && !document.querySelector(".sheet.open") && $("#searchRow").style.display === "none" ? "translateY(-100%)" : "";
+    $("#topBtn").classList.toggle("show", y > 1200);
+    lastY = y;
+  }, { passive: true });
+  $("#topBtn").onclick = () => scrollTo({ top: 0, behavior: "smooth" });
+
+  // Pull down to refresh
+  let startY = null, pulled = 0; const ptr = $("#ptr");
+  addEventListener("touchstart", (e) => { startY = scrollY <= 0 && !document.querySelector(".sheet.open") ? e.touches[0].clientY : null; }, { passive: true });
+  addEventListener("touchmove", (e) => { if (startY == null) return; pulled = Math.max(0, Math.min(120, e.touches[0].clientY - startY)); ptr.style.opacity = pulled / 80; ptr.style.transform = `translate(-50%,${pulled - 60}px) rotate(${pulled * 3}deg)`; }, { passive: true });
+  addEventListener("touchend", () => { if (startY == null) return; if (pulled > 80) { ptr.classList.add("spin"); load(true).finally(() => { ptr.classList.remove("spin"); ptr.style.opacity = 0; ptr.style.transform = ""; }); } else { ptr.style.opacity = 0; ptr.style.transform = ""; } startY = null; pulled = 0; });
+
+  function setUpdated() {
+    if (!data.updated) return;
+    const mins = (Date.now() - Date.parse(data.updated)) / 60000, a = ago(data.updated);
+    $("#updated").textContent = a === "now" ? "now" : a + " ago";
+    $("#live").classList.toggle("stale", mins > 90);
+  }
 
   async function load(manual) {
     try {
       const res = await fetch("data/feed.json?t=" + Date.now(), { cache: "no-store" });
       if (!res.ok) throw new Error(res.status);
-      data = await res.json();
-      setUpdated(); render();
-      if (manual) toast("Up to date");
+      const fresh = await res.json();
+      const changed = fresh.updated !== data.updated;
+      data = fresh; setUpdated();
+      if (changed && (manual || !rendered || scrollY < 50)) { render(); rendered = true; }
+      if (manual) toast(changed ? "Fresh posts loaded" : "You're up to date");
     } catch (e) {
-      if (!data.items.length) $("#main").innerHTML = `<div class="empty"><b>Couldn't load your feed</b>Check your connection and tap refresh.</div>`;
+      if (!data.items.length) $("#main").innerHTML = `<div class="empty"><b>Couldn't load your feed</b>Check your connection and pull down to try again.</div>`;
       else if (manual) toast("Couldn't refresh");
     }
   }
-  $("#refresh").onclick = () => load(true);
+  addEventListener("hashchange", () => { const h = location.hash.slice(1) || "all"; if (h !== current) { current = h; render(); } });
   setInterval(setUpdated, 60000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden && data.updated && Date.now() - Date.parse(data.updated) > 30 * 60000) load(); });
+  // Looks for new posts every 5 minutes while open, and whenever you come back to the app
+  setInterval(() => { if (!document.hidden) load(); }, 5 * 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
   load();
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
