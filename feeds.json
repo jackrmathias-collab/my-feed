@@ -1,0 +1,65 @@
+{
+  "_help": "This is your list of sources. To add one, copy a line and change the name, url and tab. To remove one, delete its line (watch the commas!). Tabs: arsenal, politics, music, festivals, celebs, gaming, longreads, teaching, running, money. Add \"pictures\": true to send a source's photos to the Pictures tab. Google News searches: change the words after q= to follow anything.",
+
+  "tabs": [
+    { "id": "arsenal",   "name": "Arsenal",    "colour": "#ef4444" },
+    { "id": "politics",  "name": "Politics",   "colour": "#60a5fa" },
+    { "id": "music",     "name": "Music",      "colour": "#a78bfa" },
+    { "id": "festivals", "name": "Festivals",  "colour": "#f472b6" },
+    { "id": "celebs",    "name": "Celebs",     "colour": "#fbbf24" },
+    { "id": "gaming",    "name": "Gaming",     "colour": "#34d399" },
+    { "id": "longreads", "name": "Long reads", "colour": "#e5e7eb" },
+    { "id": "teaching",  "name": "Teaching",   "colour": "#2dd4bf" },
+    { "id": "running",   "name": "Running",    "colour": "#fb923c" },
+    { "id": "money",     "name": "Money",      "colour": "#a3e635" }
+  ],
+
+  "sources": [
+    { "tab": "arsenal", "name": "BBC Sport", "url": "https://feeds.bbci.co.uk/sport/football/teams/arsenal/rss.xml" },
+    { "tab": "arsenal", "name": "Guardian Football", "url": "https://www.theguardian.com/football/arsenal/rss" },
+    { "tab": "arsenal", "name": "Arseblog News", "url": "https://arseblog.news/feed/" },
+    { "tab": "arsenal", "name": "r/Gunners", "url": "https://www.reddit.com/r/Gunners/top/.rss?t=day" },
+    { "tab": "arsenal", "name": "Google News", "url": "https://news.google.com/rss/search?q=%22Arsenal%22+(Arteta+OR+Premier+League+OR+Gunners)+when:2d&hl=en-GB&gl=GB&ceid=GB:en", "max": 15 },
+
+    { "tab": "politics", "name": "BBC Politics", "url": "https://feeds.bbci.co.uk/news/politics/rss.xml" },
+    { "tab": "politics", "name": "Guardian Politics", "url": "https://www.theguardian.com/politics/rss" },
+    { "tab": "politics", "name": "Sky News Politics", "url": "https://feeds.skynews.com/feeds/rss/politics.xml" },
+    { "tab": "politics", "name": "The Spectator", "url": "https://www.spectator.co.uk/feed", "max": 10 },
+    { "tab": "politics", "name": "New Statesman", "url": "https://www.newstatesman.com/feed", "max": 10 },
+
+    { "tab": "music", "name": "Guardian Music", "url": "https://www.theguardian.com/music/rss" },
+    { "tab": "music", "name": "Mixmag", "url": "https://mixmag.net/rss.xml" },
+    { "tab": "music", "name": "DJ Mag", "url": "https://djmag.com/rss.xml" },
+    { "tab": "music", "name": "Pitchfork News", "url": "https://pitchfork.com/feed/feed-news/rss", "max": 10 },
+    { "tab": "music", "name": "Your artists", "url": "https://news.google.com/rss/search?q=%22Four+Tet%22+OR+Overmono+OR+%22Joy+Orbison%22+OR+%22Shanti+Celeste%22+OR+%22Bicep+DJ%22+OR+%22Bicep+album%22+OR+%22Dusky+DJ%22&hl=en-GB&gl=GB&ceid=GB:en", "max": 15 },
+
+    { "tab": "festivals", "name": "Guardian Festivals", "url": "https://www.theguardian.com/music/festivals/rss" },
+    { "tab": "festivals", "name": "NME Festivals", "url": "https://www.nme.com/news/festivals/feed" },
+    { "tab": "festivals", "name": "Line-ups", "url": "https://news.google.com/rss/search?q=(%22festival+line-up%22+OR+%22festival+lineup%22)+(UK+OR+London+OR+Glastonbury+OR+%22Field+Day%22+OR+%22All+Points+East%22+OR+Houghton+OR+Dekmantel)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 15 },
+
+    { "tab": "celebs", "name": "Guardian Celebrity", "url": "https://www.theguardian.com/lifeandstyle/celebrity/rss", "pictures": true },
+    { "tab": "celebs", "name": "BBC Entertainment", "url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "pictures": true },
+    { "tab": "celebs", "name": "Daily Mail Showbiz", "url": "https://www.dailymail.co.uk/tvshowbiz/index.rss", "pictures": true, "max": 15 },
+    { "tab": "celebs", "name": "Guardian Fashion", "url": "https://www.theguardian.com/fashion/rss", "pictures": true },
+
+    { "tab": "gaming", "name": "Push Square", "url": "https://www.pushsquare.com/feeds/latest" },
+    { "tab": "gaming", "name": "PlayStation Blog", "url": "https://blog.playstation.com/feed/" },
+    { "tab": "gaming", "name": "Eurogamer", "url": "https://www.eurogamer.net/feed" },
+    { "tab": "gaming", "name": "Guardian Games", "url": "https://www.theguardian.com/games/rss" },
+
+    { "tab": "longreads", "name": "The Long Read", "url": "https://www.theguardian.com/news/series/the-long-read/rss" },
+    { "tab": "longreads", "name": "Aeon", "url": "https://aeon.co/feed.rss" },
+    { "tab": "longreads", "name": "Longreads", "url": "https://longreads.com/feed/" },
+
+    { "tab": "teaching", "name": "Schools Week", "url": "https://schoolsweek.co.uk/feed/" },
+    { "tab": "teaching", "name": "Guardian Schools", "url": "https://www.theguardian.com/education/schools/rss" },
+    { "tab": "teaching", "name": "BBC Education", "url": "https://feeds.bbci.co.uk/news/education/rss.xml" },
+    { "tab": "teaching", "name": "AI in education", "url": "https://news.google.com/rss/search?q=AI+(schools+OR+teachers+OR+classroom)+UK+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10 },
+
+    { "tab": "running", "name": "Runner's World UK", "url": "https://www.runnersworld.com/uk/rss/all.xml/" },
+    { "tab": "running", "name": "Running news", "url": "https://news.google.com/rss/search?q=(%22London+Marathon%22+OR+parkrun+OR+%22half+marathon%22)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10 },
+
+    { "tab": "money", "name": "Guardian Money", "url": "https://www.theguardian.com/money/rss" },
+    { "tab": "money", "name": "MoneySavingExpert", "url": "https://www.moneysavingexpert.com/news/feeds/news.rss" }
+  ]
+}

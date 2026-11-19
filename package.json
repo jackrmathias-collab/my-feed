@@ -1,0 +1,13 @@
+{
+  "name": "my-feed",
+  "version": "1.0.0",
+  "description": "Jack's personal feed",
+  "scripts": {
+    "fetch": "node scripts/fetch-feeds.mjs"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.5.7"
+  },
+  "private": true,
+  "type": "module"
+}
