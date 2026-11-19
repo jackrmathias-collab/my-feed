@@ -68,7 +68,6 @@
     {"tab": "arsenal", "name": "BBC Sport", "url": "https://feeds.bbci.co.uk/sport/football/teams/arsenal/rss.xml"},
     {"tab": "arsenal", "name": "Guardian Football", "url": "https://www.theguardian.com/football/arsenal/rss"},
     {"tab": "arsenal", "name": "Arseblog News", "url": "https://arseblog.news/feed/"},
-    {"tab": "arsenal", "name": "r/Gunners", "url": "https://www.reddit.com/r/Gunners/top/.rss?t=day"},
     {"tab": "arsenal", "name": "Google News", "url": "https://news.google.com/rss/search?q=%22Arsenal%22+(Arteta+OR+Premier+League+OR+Gunners)+when:2d&hl=en-GB&gl=GB&ceid=GB:en", "max": 15},
 
     {"tab": "arsenalwomen", "name": "Guardian", "url": "https://www.theguardian.com/football/arsenal-women/rss"},
@@ -89,7 +88,7 @@
     {"tab": "politics", "name": "BBC Politics", "url": "https://feeds.bbci.co.uk/news/politics/rss.xml"},
     {"tab": "politics", "name": "Guardian Politics", "url": "https://www.theguardian.com/politics/rss"},
     {"tab": "politics", "name": "Sky News Politics", "url": "https://feeds.skynews.com/feeds/rss/politics.xml"},
-    {"tab": "politics", "name": "The Spectator", "url": "https://www.spectator.co.uk/feed", "max": 10},
+    {"tab": "politics", "name": "The Spectator", "url": "https://news.google.com/rss/search?q=site:spectator.co.uk+politics+when:3d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
     {"tab": "politics", "name": "New Statesman", "url": "https://www.newstatesman.com/feed", "max": 10},
 
     {"tab": "local", "name": "Local news", "url": "https://news.google.com/rss/search?q=Lewisham+OR+Brockley+OR+Catford+OR+Deptford+OR+%22Honor+Oak%22+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 20},
@@ -105,12 +104,13 @@
     {"tab": "music", "name": "Your artists", "url": "https://news.google.com/rss/search?q=%22Four+Tet%22+OR+Overmono+OR+%22Joy+Orbison%22+OR+%22Shanti+Celeste%22+OR+%22Bicep+DJ%22+OR+%22Bicep+album%22+OR+%22Dusky+DJ%22&hl=en-GB&gl=GB&ceid=GB:en", "max": 15},
 
     {"tab": "festivals", "name": "Guardian Festivals", "url": "https://www.theguardian.com/music/festivals/rss"},
-    {"tab": "festivals", "name": "NME Festivals", "url": "https://www.nme.com/news/festivals/feed"},
+    {"tab": "festivals", "name": "NME Festivals", "url": "https://news.google.com/rss/search?q=site:nme.com+festival+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
     {"tab": "festivals", "name": "Line-ups", "url": "https://news.google.com/rss/search?q=(%22festival+line-up%22+OR+%22festival+lineup%22)+(UK+OR+London+OR+Glastonbury+OR+%22Field+Day%22+OR+%22All+Points+East%22+OR+Houghton+OR+Dekmantel)+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 15},
 
     {"tab": "celebs", "name": "Guardian Celebrity", "url": "https://www.theguardian.com/lifeandstyle/celebrity/rss", "pictures": true},
     {"tab": "celebs", "name": "BBC Entertainment", "url": "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "pictures": true},
     {"tab": "celebs", "name": "Daily Mail Showbiz", "url": "https://www.dailymail.co.uk/tvshowbiz/index.rss", "pictures": true, "max": 15},
+    {"tab": "celebs", "name": "Just Jared", "url": "https://www.justjared.com/feed/", "pictures": true, "max": 25},
     {"tab": "celebs", "name": "Guardian Fashion", "url": "https://www.theguardian.com/fashion/rss", "pictures": true},
 
     {"tab": "tv", "name": "Guardian TV", "url": "https://www.theguardian.com/tv-and-radio/rss", "pictures": true},
@@ -136,7 +136,7 @@
     {"tab": "longreads", "name": "Aeon", "url": "https://aeon.co/feed.rss"},
     {"tab": "longreads", "name": "Longreads", "url": "https://longreads.com/feed/"},
 
-    {"tab": "teaching", "name": "Schools Week", "url": "https://schoolsweek.co.uk/feed/"},
+    {"tab": "teaching", "name": "Schools Week", "url": "https://news.google.com/rss/search?q=site:schoolsweek.co.uk+when:7d&hl=en-GB&gl=GB&ceid=GB:en"},
     {"tab": "teaching", "name": "Guardian Schools", "url": "https://www.theguardian.com/education/schools/rss"},
     {"tab": "teaching", "name": "BBC Education", "url": "https://feeds.bbci.co.uk/news/education/rss.xml"},
     {"tab": "teaching", "name": "AI in education", "url": "https://news.google.com/rss/search?q=AI+(schools+OR+teachers+OR+classroom)+UK+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
@@ -151,7 +151,6 @@
     {"tab": "money", "name": "Guardian Money", "url": "https://www.theguardian.com/money/rss"},
     {"tab": "money", "name": "MoneySavingExpert", "url": "https://www.moneysavingexpert.com/news/feeds/news.rss"},
 
-    {"tab": "travel", "name": "Secret Flying", "url": "https://www.secretflying.com/feed/", "only": ["London", "UK cities"]},
     {"tab": "travel", "name": "Guardian Travel", "url": "https://www.theguardian.com/travel/rss", "pictures": true, "max": 10},
     {"tab": "travel", "name": "Cheap flights", "url": "https://news.google.com/rss/search?q=%22cheap+flights%22+OR+%22flight+deal%22+London+when:7d&hl=en-GB&gl=GB&ceid=GB:en", "max": 10},
 

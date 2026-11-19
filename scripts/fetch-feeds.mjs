@@ -20,6 +20,14 @@ if (people.length) {
     const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     config.sources.push({ tab: "celebs", name: "Showbiz", url: `https://www.dailymail.co.uk/tvshowbiz/${slug}/index.rss`, pictures: true, max: 6, quiet: true });
   }
+  const gossip = [
+    "https://www.dailymail.co.uk/tvshowbiz/index.rss",
+    "https://www.dailymail.co.uk/femail/index.rss",
+    "https://www.justjared.com/feed/",
+    "https://www.thesun.co.uk/tvandshowbiz/feed/",
+    "https://hollywoodlife.com/feed/",
+  ];
+  for (const url of gossip) config.sources.push({ tab: "celebs", name: "Showbiz", url, pictures: true, only: people, max: 30, quiet: true });
   for (let i = 0; i < people.length; i += 8) {
     const q = people.slice(i, i + 8).map((n) => `%22${encodeURIComponent(n).replace(/%20/g, "+")}%22`).join("+OR+");
     config.sources.push({ tab: "celebs", name: "Showbiz news", url: `https://news.google.com/rss/search?q=(${q})+when:3d&hl=en-GB&gl=GB&ceid=GB:en`, max: 10, quiet: true });
@@ -33,8 +41,8 @@ const parser = new XMLParser({
   attributeNamePrefix: "@",
   textNodeName: "#text",
   cdataPropName: false,
-  processEntities: true,
-  htmlEntities: true,
+  processEntities: false, // we decode entities ourselves (some big feeds trip the parser's limit)
+  htmlEntities: false,
   removeNSPrefix: false,
 });
 
@@ -73,7 +81,7 @@ function pickImage(it) {
   }
   if (!candidates.length) return null;
   candidates.sort((a, b) => b.w - a.w);
-  let url = candidates[0].url;
+  let url = decode(candidates[0].url);
   // BBC sends tiny thumbnails; ask for a bigger size.
   url = url.replace(/(ichef\.bbci\.co\.uk\/(?:ace\/standard|news)\/)\d+\//, "$1800/");
   return url;
@@ -94,10 +102,10 @@ function linkOf(it) {
 function normalise(it, src) {
   let title = stripHtml(text(it.title));
   let sourceName = src.name;
-  const link = linkOf(it);
+  const link = decode(linkOf(it));
   // Google News: "Headline - Publisher"
   if (/news\.google\.com/.test(src.url)) {
-    const pub = text(it.source);
+    const pub = decode(text(it.source));
     if (pub) {
       sourceName = pub;
       title = title.replace(new RegExp("\\s+-\\s+" + pub.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$"), "");
