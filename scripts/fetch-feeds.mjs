@@ -26,7 +26,7 @@ const people = config.people || [];
 if (people.length) {
   for (const name of people) {
     const slug = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    config.sources.push({ tab: "celebs", name: "Showbiz", url: `https://www.dailymail.co.uk/tvshowbiz/${slug}/index.rss`, pictures: true, max: 6, quiet: true });
+    config.sources.push({ tab: "celebs", name: "Showbiz", url: `https://www.dailymail.co.uk/tvshowbiz/${slug}/index.rss`, pictures: true, max: 10, quiet: true });
   }
   const gossip = [
     "https://www.dailymail.co.uk/tvshowbiz/index.rss",
@@ -35,7 +35,7 @@ if (people.length) {
     "https://www.thesun.co.uk/tvandshowbiz/feed/",
     "https://hollywoodlife.com/feed/",
   ];
-  for (const url of gossip) config.sources.push({ tab: "celebs", name: "Showbiz", url, pictures: true, only: people, max: 30, quiet: true });
+  for (const url of gossip) config.sources.push({ tab: "celebs", name: "Showbiz", url, pictures: true, only: people, max: 60, quiet: true });
   for (let i = 0; i < people.length; i += 8) {
     const q = people.slice(i, i + 8).map((n) => `%22${encodeURIComponent(n).replace(/%20/g, "+")}%22`).join("+OR+");
     config.sources.push({ tab: "celebs", name: "Showbiz news", url: `https://news.google.com/rss/search?q=(${q})+when:3d&hl=en-GB&gl=GB&ceid=GB:en`, max: 10, quiet: true });
@@ -241,6 +241,9 @@ items.sort((a, b) => (Date.parse(b.date) || 0) - (Date.parse(a.date) || 0));
 // Star anything that mentions one of your artists
 const artistRe = artists.length ? new RegExp("\\b(" + artists.map((a) => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\b", "i") : null;
 if (artistRe) for (const it of items) { const m = it.title.match(artistRe); if (m) it.fav = m[1]; }
+// Tag posts about the people you follow, so Pictures can filter by person
+const peopleRe = people.length ? new RegExp("(" + people.map((a) => a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "i") : null;
+if (peopleRe) for (const it of items) { const m = (it.title + " " + it.summary).match(peopleRe); if (m && it.image) { it.who = people.find((p) => p.toLowerCase() === m[1].toLowerCase()); it.pictures = true; } }
 
 // ---------- Extras: bigger photos and reading times ----------
 // Reuse what we worked out last time, so each refresh only visits brand-new articles.
@@ -276,11 +279,13 @@ if (!FIXTURES) {
     if (c) { if (c.big) it.big = c.big; if (c.mins) it.mins = c.mins; it.checked = 1; }
     else todo.push(it);
   }
-  const batch = todo.slice(0, 160);
+  // Your people's photos get upgraded first
+  todo.sort((a, b) => (b.who ? 1 : 0) - (a.who ? 1 : 0));
+  const batch = todo.slice(0, 260);
   await Promise.all(Array.from({ length: 10 }, async () => {
     while (batch.length) { const it = batch.shift(); try { Object.assign(it, await extras(it)); } catch {} it.checked = 1; }
   }));
-  console.log(`Extras: ${prevCache.size} remembered, ${Math.min(todo.length, 160)} new articles checked.`);
+  console.log(`Extras: ${prevCache.size} remembered, ${Math.min(todo.length, 260)} new articles checked.`);
 }
 
 // ---------- Arsenal: next match and last result ----------
@@ -321,6 +326,7 @@ if (!FIXTURES) {
 const out = {
   updated: new Date().toISOString(),
   tabs: config.tabs,
+  people,
   arsenal,
   health: (() => {
     const h = [], groups = {};

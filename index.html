@@ -151,6 +151,9 @@
   .gchip{flex:none;display:flex;align-items:center;gap:8px;padding:7px 12px 7px 7px;border-radius:14px;background:var(--glass);border:1px solid var(--line);font-size:13.5px;font-weight:600}
   .gchip i{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 13px "Space Grotesk",sans-serif;color:#000;font-style:normal}
   .gchip.done{opacity:.45}
+  .pchip{padding:8px 13px}
+  .pchip.on{background:#fda4af;color:#0b0b0f;border-color:transparent}
+  .pchip.on span{color:#3b0a14!important}
   .gchip.done:after{content:"✓";color:#4ade80;margin-left:2px}
 
   .grid{columns:2;column-gap:8px;padding:8px}
@@ -344,7 +347,7 @@
 
   let data = { items: [], tabs: [], health: [] };
   let current = location.hash.slice(1) || "all";
-  let query = "";
+  let query = "", picWho = "";
   let saved = store.get("saved", {});
   let muted = store.get("muted", []);
   let hiddenFromAll = store.get("hiddenFromAll", []);
@@ -471,8 +474,8 @@
     if (mixes.length) r.push(section("Fresh mixes", tabInfo("mixes").colour, "mixes", mixes.map(mixCard).join("")));
     const vids = v.filter((x) => x.tab === "youtube" && x.image).slice(0, 10);
     if (vids.length) r.push(section("Watch", tabInfo("youtube").colour, "youtube", vids.map((x) => vid(x)).join("")));
-    const pics = v.filter((x) => x.pictures && x.image).slice(0, 14);
-    if (pics.length) r.push(section("Looking good", "#fda4af", "pictures", pics.map(pic).join("")));
+    const pics = v.filter((x) => x.pictures && x.image).slice(16, 32);
+    if (pics.length) r.push(section("More pictures", "#fda4af", "pictures", pics.map(pic).join("")));
     const reads = v.filter((x) => x.tab === "longreads").slice(0, 8);
     if (reads.length) r.push(section("Long reads", "#e5e7eb", "longreads", reads.map(read).join("")));
     const film = v.filter((x) => x.tab === "film" && x.image).slice(0, 10);
@@ -519,7 +522,7 @@
   function openViewer(id) {
     const v = visible().concat(Object.values(saved));
     // Swipe through the photos in what you're looking at
-    let set = current === "pictures" ? v.filter((x) => x.pictures && x.image) : current === "all" ? v.filter((x) => x.image && !isVideo(x) && !hiddenFromAll.includes(x.tab)) : current === "saved" ? Object.values(saved).filter((x) => x.image) : v.filter((x) => x.image && !isVideo(x) && x.tab === current);
+    let set = current === "pictures" ? v.filter((x) => x.pictures && x.image && (!picWho || x.who === picWho)) : current === "all" ? v.filter((x) => x.image && !isVideo(x) && !hiddenFromAll.includes(x.tab)) : current === "saved" ? Object.values(saved).filter((x) => x.image) : v.filter((x) => x.image && !isVideo(x) && x.tab === current);
     const it0 = v.find((x) => x.id === id); if (!it0) return;
     if (it0.pictures && current === "all") set = v.filter((x) => x.pictures && x.image);
     const seen = new Set(); lbSet = set.filter((x) => !seen.has(x.id) && seen.add(x.id));
@@ -598,13 +601,22 @@
       if (tops.length) html += `<div class="rail" id="heroRail">${tops.map(hero).join("")}</div><div class="dots" id="dots">${tops.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>`;
       html += matchCard();
       html += `<div class="sec"><h2>Today's games</h2><button data-open-games>All →</button></div><div class="gchips" id="gchips">${gameChips()}</div>`;
+      const lg = pool.filter((x) => x.pictures && x.image);
+      const lgSorted = [...lg.filter((x) => x.who), ...lg.filter((x) => !x.who)].slice(0, 16);
+      if (lgSorted.length) html += section("Looking good", "#fda4af", "pictures", lgSorted.map(pic).join(""));
       html += `<div class="sec"><h2>Latest</h2></div>`;
       const topIds = new Set(tops.map((x) => x.id));
       list = spreadOut(pool.filter((x) => !topIds.has(x.id) && !["youtube", "podcasts", "mixes"].includes(x.tab)));
       railQueue = rails(pool);
     } else if (current === "pictures") {
-      list = v.filter((it) => it.pictures && it.image);
-      html = `<div class="grid" id="list"></div>`;
+      const pics = v.filter((it) => it.pictures && it.image);
+      const counts = {}; pics.forEach((x) => { if (x.who) counts[x.who] = (counts[x.who] || 0) + 1; });
+      const names = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      if (picWho && !counts[picWho]) picWho = "";
+      list = picWho ? pics.filter((x) => x.who === picWho) : pics;
+      html = `<div class="sec"><h2><span class="d" style="background:#fda4af"></span>Pictures</h2><span style="color:var(--muted);font-size:13px">${list.length} photos · newest first</span></div>
+        <div class="gchips" style="padding-bottom:6px"><button class="gchip pchip ${picWho ? "" : "on"}" data-who="">Everyone</button>${names.map((n) => `<button class="gchip pchip ${picWho === n ? "on" : ""}" data-who="${esc(n)}">${esc(n)} <span style="color:var(--muted);font-weight:500">${counts[n]}</span></button>`).join("")}</div>
+        <div class="grid" id="list"></div>`;
     } else if (current === "saved") {
       list = Object.values(saved).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
     } else if (current === "mixes") {
@@ -659,6 +671,8 @@
 
   // ---------- Events ----------
   document.addEventListener("click", async (e) => {
+    const wb = e.target.closest("[data-who]");
+    if (wb) { picWho = wb.dataset.who; render(); return; }
     const lbEl = e.target.closest("[data-lb]");
     if (lbEl && !e.target.closest(".lb")) { e.preventDefault(); openViewer(lbEl.dataset.lb); return; }
     const g = e.target.closest("[data-game]");
